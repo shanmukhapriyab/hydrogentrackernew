@@ -5,6 +5,8 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const { Server } = require('socket.io');
 
+const authRoutes = require('./routes/auth');
+
 dotenv.config();
 
 const app = express();
@@ -26,6 +28,8 @@ app.use(
 
 app.use(express.json());
 
+app.use('/api/auth', authRoutes);
+
 app.get('/', (req, res) => {
   res.json({
     message: 'Hydrogen Tracker API is running'
@@ -35,7 +39,10 @@ app.get('/', (req, res) => {
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    database:
+      mongoose.connection.readyState === 1
+        ? 'connected'
+        : 'disconnected'
   });
 });
 
@@ -51,7 +58,8 @@ const PORT = process.env.PORT || 5000;
 
 mongoose
   .connect(
-    process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hydrogen-tracker-new'
+    process.env.MONGO_URI ||
+      'mongodb://127.0.0.1:27017/hydrogen-tracker-new'
   )
   .then(() => {
     console.log('MongoDB connected');
@@ -61,5 +69,8 @@ mongoose
     });
   })
   .catch((error) => {
-    console.error('MongoDB connection failed:', error.message);
+    console.error(
+      'MongoDB connection failed:',
+      error.message
+    );
   });
