@@ -1,0 +1,10 @@
+{
+  "description": "Streamline hydrogen supply chain management with a comprehensive dashboard for producers, customers, and administrators, featuring real-time analytics and logistics tracking.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
