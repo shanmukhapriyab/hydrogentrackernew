@@ -7,6 +7,8 @@ const { Server } = require('socket.io');
 
 const authRoutes = require('./routes/auth');
 const productionRoutes = require('./routes/production');
+const storageRoutes = require('./routes/storage');
+
 dotenv.config();
 
 const app = express();
@@ -30,6 +32,8 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/production', productionRoutes);
+app.use('/api/storage', storageRoutes);
+
 app.get('/', (req, res) => {
   res.json({
     message: 'Hydrogen Tracker API is running'
@@ -46,7 +50,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-io.on('connection', (socket) => {
+io.on('connection', socket => {
   console.log('Client connected:', socket.id);
 
   socket.on('disconnect', () => {
@@ -68,7 +72,7 @@ mongoose
       console.log(`Server running on http://localhost:${PORT}`);
     });
   })
-  .catch((error) => {
+  .catch(error => {
     console.error(
       'MongoDB connection failed:',
       error.message
