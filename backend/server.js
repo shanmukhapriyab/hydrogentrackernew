@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const { Server } = require('socket.io');
 
 const authRoutes = require('./routes/auth');
-
+const productionRoutes = require('./routes/production');
 dotenv.config();
 
 const app = express();
@@ -29,7 +29,7 @@ app.use(
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
-
+app.use('/api/production', productionRoutes);
 app.get('/', (req, res) => {
   res.json({
     message: 'Hydrogen Tracker API is running'
