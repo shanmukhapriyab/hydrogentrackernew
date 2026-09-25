@@ -83,7 +83,7 @@ router.post('/login', async (req, res) => {
         id: user._id,
         role: user.role
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || 'hydrogen-tracker-dev-secret',
       {
         expiresIn: '1d'
       }

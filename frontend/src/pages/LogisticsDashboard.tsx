@@ -1,20 +1,36 @@
+import { useEffect, useState } from 'react';
 import { Truck, Package, Clock, AlertTriangle, MapPin, Navigation } from 'lucide-react';
 import { StatCard, Badge, Card, ProgressBar, PageHeader, Button, Table, Tr, Td } from '../components/ui';
-import { SHIPMENTS } from '../data/mockData';
+import { api } from '../lib/api';
+import { subscribeToResource } from '../lib/realtime';
+
+type Shipment = {
+  _id: string;
+  shipmentId?: string;
+  id?: string;
+  origin: string;
+  destination: string;
+  customer: string;
+  driver: string;
+  quantity: number;
+  status: string;
+  eta?: string;
+  progress: number;
+  lat: number;
+  lng?: number;
+  lon?: number;
+};
 
 // Simple SVG map of USA with shipment dots
-function LogisticsMap({ onShipmentClick }: { onShipmentClick: (id: string) => void }) {
+function LogisticsMap({ shipments, onShipmentClick }: { shipments: Shipment[]; onShipmentClick: (id: string) => void }) {
   // US map approximate paths for major states
-  const shipmentPoints = [
-    { id: 'SHP-2026-0841', cx: 220, cy: 300, status: 'transit', label: 'Austin TX' },
-    { id: 'SHP-2026-0842', cx: 55, cy: 290, status: 'delivered', label: 'San Diego CA' },
-    { id: 'SHP-2026-0843', cx: 600, cy: 130, status: 'transit', label: 'Boston MA' },
-    { id: 'SHP-2026-0844', cx: 215, cy: 310, status: 'delayed', label: 'San Antonio TX' },
-    { id: 'SHP-2026-0845', cx: 90, cy: 270, status: 'pending', label: 'Phoenix AZ' },
-    { id: 'SHP-2026-0846', cx: 440, cy: 155, status: 'pending', label: 'Chicago IL' },
-    { id: 'SHP-2026-0847', cx: 310, cy: 318, status: 'transit', label: 'New Orleans LA' },
-    { id: 'SHP-2026-0848', cx: 110, cy: 250, status: 'delivered', label: 'Las Vegas NV' },
-  ];
+  const shipmentPoints = shipments.map(shipment => ({
+    ...shipment,
+    id: shipment.shipmentId || shipment.id || shipment._id,
+    cx: Math.max(60, Math.min(640, ((shipment.lng ?? shipment.lon ?? -95) + 125) * 5.2)),
+    cy: Math.max(90, Math.min(350, (49 - shipment.lat) * 8.2)),
+    label: shipment.destination,
+  }));
 
   const COLOR = {
     transit: '#2563eb',
@@ -75,18 +91,26 @@ function LogisticsMap({ onShipmentClick }: { onShipmentClick: (id: string) => vo
       {/* Overlay badge */}
       <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-lg px-3 py-2">
         <p className="text-xs font-semibold text-slate-700">Live Shipment Map</p>
-        <p className="text-xs text-slate-400">{SHIPMENTS.filter(s => s.status === 'transit').length} vehicles in transit</p>
+        <p className="text-xs text-slate-400">{shipments.filter(s => s.status === 'transit').length} vehicles in transit</p>
       </div>
     </div>
   );
 }
 
 export default function LogisticsDashboard({ onNavigate }: { onNavigate: (p: any) => void }) {
-  const inTransit = SHIPMENTS.filter(s => s.status === 'transit').length;
-  const delayed = SHIPMENTS.filter(s => s.status === 'delayed').length;
-  const delivered = SHIPMENTS.filter(s => s.status === 'delivered').length;
-  const pending = SHIPMENTS.filter(s => s.status === 'pending').length;
-  const totalKg = SHIPMENTS.reduce((s, sh) => s + sh.quantity, 0);
+  const [shipments, setShipments] = useState<Shipment[]>([]);
+
+  useEffect(() => {
+    const load = () => api<Shipment[]>('/shipments').then(setShipments).catch(console.error);
+    load();
+    return subscribeToResource('shipments', load);
+  }, []);
+
+  const inTransit = shipments.filter(s => s.status === 'transit').length;
+  const delayed = shipments.filter(s => s.status === 'delayed').length;
+  const delivered = shipments.filter(s => s.status === 'delivered').length;
+  const pending = shipments.filter(s => s.status === 'pending').length;
+  const totalKg = shipments.reduce((sum, shipment) => sum + shipment.quantity, 0);
 
   return (
     <div className="p-6 space-y-6 max-w-screen-xl fade-in">
@@ -110,17 +134,17 @@ export default function LogisticsDashboard({ onNavigate }: { onNavigate: (p: any
       </div>
 
       {/* Map */}
-      <LogisticsMap onShipmentClick={() => onNavigate('shipment-details')} />
+      <LogisticsMap shipments={shipments} onShipmentClick={() => onNavigate('shipment-details')} />
 
       {/* Shipments table */}
       <Card title="Active Shipments" noPadding actions={
         <Button size="sm" onClick={() => onNavigate('shipment-details')}>View All</Button>
       }>
         <Table headers={['Shipment ID', 'Route', 'Customer', 'Driver', 'Quantity', 'Progress', 'ETA', 'Status', '']}>
-          {SHIPMENTS.map(s => (
-            <Tr key={s.id} onClick={() => onNavigate('shipment-details')}>
+          {shipments.map(s => (
+            <Tr key={s._id} onClick={() => onNavigate('shipment-details')}>
               <Td>
-                <span className="font-mono text-xs font-semibold text-blue-600">{s.id}</span>
+                <span className="font-mono text-xs font-semibold text-blue-600">{s.shipmentId || s.id || s._id}</span>
               </Td>
               <Td>
                 <div className="text-xs">

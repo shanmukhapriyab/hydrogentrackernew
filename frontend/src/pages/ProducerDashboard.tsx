@@ -36,6 +36,8 @@ import {
   ALERTS,
   STORAGE_TANKS
 } from '../data/mockData';
+import { api } from '../lib/api';
+import { subscribeToResource } from '../lib/realtime';
 
 type Production = {
   _id: string;
@@ -59,15 +61,7 @@ export default function ProducerDashboard({
   useEffect(() => {
     const fetchProductions = async () => {
       try {
-        const response = await fetch(
-          'http://localhost:5000/api/production'
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch production data');
-        }
-
-        const data = await response.json();
+        const data = await api<Production[]>('/production');
         setProductions(data);
       } catch (error) {
         console.error('Production fetch failed:', error);
@@ -77,6 +71,7 @@ export default function ProducerDashboard({
     };
 
     fetchProductions();
+    return subscribeToResource('production', fetchProductions);
   }, []);
 
   const totalOutputKg = productions.reduce(

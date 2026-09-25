@@ -10,6 +10,8 @@ import {
   PageHeader,
   Button,
 } from '../components/ui';
+import { api } from '../lib/api';
+import { subscribeToResource } from '../lib/realtime';
 
 type Storage = {
   _id: string;
@@ -36,21 +38,19 @@ export default function StorageManagement() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/storage')
-      .then(response => response.json())
-      .then(data => {
+    const load = () => api<Storage[]>('/storage').then(data => {
         setStorages(data);
 
         if (data.length > 0) {
           setSelected(data[0]);
         }
-      })
-      .catch(error => {
+      }).catch(error => {
         console.error('Failed to fetch storage data:', error);
-      })
-      .finally(() => {
+      }).finally(() => {
         setLoading(false);
       });
+    load();
+    return subscribeToResource('storage', load);
   }, []);
 
   const totalCap = storages.reduce(

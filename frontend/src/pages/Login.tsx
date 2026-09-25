@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Zap, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { api } from '../lib/api';
 
 type UserRole = 'admin' | 'producer' | 'logistics' | 'customer';
 
@@ -59,25 +60,11 @@ export default function Login({ onLogin }: LoginProps) {
     try {
       setLoading(true);
 
-      const response = await fetch(
-        'http://localhost:5000/api/auth/login',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            email,
-            password
-          })
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
+      const data = await api<{ token: string; user: { role: UserRole } }>('/auth/login', {
+        method: 'POST',
+        auth: false,
+        body: JSON.stringify({ email, password }),
+      });
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
