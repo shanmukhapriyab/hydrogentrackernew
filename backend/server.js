@@ -11,6 +11,8 @@ const storageRoutes = require('./routes/storage');
 const shipmentRoutes = require('./routes/shipments');
 const { requireAuth } = require('./middleware/auth');
 const resourceRouter = require('./routes/resource');
+const userRoutes = require('./routes/users');
+const analyticsRoutes = require('./routes/analytics');
 const Order = require('./models/Order');
 const Delivery = require('./models/Delivery');
 const Notification = require('./models/Notification');
@@ -42,6 +44,8 @@ app.use('/api/shipments', requireAuth, shipmentRoutes);
 app.use('/api/orders', requireAuth, resourceRouter(Order, { ownerOnly: true }));
 app.use('/api/deliveries', requireAuth, resourceRouter(Delivery));
 app.use('/api/notifications', requireAuth, resourceRouter(Notification, { ownerOnly: true, ownerField: 'userId' }));
+app.use('/api/users', requireAuth, userRoutes);
+app.use('/api/analytics', requireAuth, analyticsRoutes);
 app.get('/', (req, res) => {
   res.json({
     message: 'Hydrogen Tracker API is running'

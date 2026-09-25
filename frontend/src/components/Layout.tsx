@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Factory, Database, Truck, Package, Users,
   BarChart3, Settings, Bell, LogOut, ChevronRight, Menu, X,
   Zap, ShoppingCart, MapPin, User, ChevronDown
 } from 'lucide-react';
-import { ALERTS } from '../data/mockData';
+import { api } from '../lib/api';
+import { subscribeToResource } from '../lib/realtime';
 
 type Page =
   | 'login' | 'producer-dashboard' | 'production' | 'storage'
@@ -72,11 +73,16 @@ const ROLE_NAMES: Record<UserRole, string> = {
   customer: 'Thomas Berg',
 };
 
-const unreadCount = ALERTS.filter(a => !a.read).length;
-
 export default function Layout({ currentPage, onNavigate, userRole, children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navItems = NAV_ITEMS[userRole];
+
+  useEffect(() => {
+    const load = () => api<{ read: boolean }[]>('/notifications').then(items => setUnreadCount(items.filter(item => !item.read).length)).catch(() => setUnreadCount(0));
+    load();
+    return subscribeToResource('notifications', load);
+  }, []);
 
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden">

@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
 import { Users, Factory, Truck, DollarSign, AlertTriangle, TrendingUp, Shield, Activity } from 'lucide-react';
 import { StatCard, Badge, Card, ProgressBar, PageHeader, Button, Table, Tr, Td } from '../components/ui';
-import { PLANTS, SHIPMENTS, USERS, ALERTS, PRODUCTION_CHART, REVENUE_CHART } from '../data/mockData';
+import { PLANTS, SHIPMENTS, PRODUCTION_CHART, REVENUE_CHART } from '../data/mockData';
+import { api } from '../lib/api';
+import { subscribeToResource } from '../lib/realtime';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 
 const SYSTEM_METRICS = [
@@ -20,8 +23,29 @@ const PIE_DATA = [
 const PIE_COLORS = ['#2563eb', '#10b981', '#94a3b8'];
 
 export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) => void }) {
-  const activeUsers = USERS.filter(u => u.status === 'active').length;
-  const criticalAlerts = ALERTS.filter(a => a.type === 'critical' && !a.read).length;
+  const [users, setUsers] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [summary, setSummary] = useState<any>({ totals: {}, status: {} });
+
+  useEffect(() => {
+    const load = () => Promise.all([
+      api<any[]>('/users'),
+      api<any[]>('/notifications'),
+      api<any>('/analytics/summary'),
+    ]).then(([userData, alertData, summaryData]) => {
+      setUsers(userData.map(user => ({ ...user, id: user._id, role: user.role[0].toUpperCase() + user.role.slice(1), status: 'active', lastLogin: 'Current session' })));
+      setAlerts(alertData.map(alert => ({ ...alert, id: alert._id, time: alert.createdAt ? new Date(alert.createdAt).toLocaleString() : 'Recently' })));
+      setSummary(summaryData);
+    }).catch(console.error);
+    load();
+    const stopUsers = subscribeToResource('users', load);
+    const stopAlerts = subscribeToResource('notifications', load);
+    const stopAnalytics = subscribeToResource('production', load);
+    return () => { stopUsers(); stopAlerts(); stopAnalytics(); };
+  }, []);
+
+  const activeUsers = users.length;
+  const criticalAlerts = alerts.filter(alert => alert.type === 'critical' && !alert.read).length;
 
   return (
     <div className="p-6 space-y-6 max-w-screen-xl fade-in">
@@ -39,8 +63,8 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
       {/* KPI row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Total Revenue (Sep)" value="$3.74M" change={4.6} changeLabel="vs Aug" icon={<DollarSign size={18} />} color="green" />
-        <StatCard label="Active Users" value={activeUsers} unit={`/${USERS.length}`} icon={<Users size={18} />} color="blue" />
-        <StatCard label="Plants Online" value={5} unit="/6" icon={<Factory size={18} />} color="amber" />
+        <StatCard label="Active Users" value={activeUsers} unit={`/${users.length}`} icon={<Users size={18} />} color="blue" />
+        <StatCard label="Plants Online" value={summary.totals?.productionCount || 0} unit="live" icon={<Factory size={18} />} color="amber" />
         <StatCard label="Critical Alerts" value={criticalAlerts} icon={<AlertTriangle size={18} />} color="red" />
       </div>
 
@@ -95,12 +119,12 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
             <Button size="sm" onClick={() => onNavigate('user-management')}>Manage Users</Button>
           }>
             <Table headers={['User', 'Role', 'Last Active', 'Status', '']}>
-              {USERS.map(user => (
+              {users.map(user => (
                 <Tr key={user.id}>
                   <Td>
                     <div className="flex items-center gap-2.5">
                       <div className="w-7 h-7 bg-slate-200 rounded-full flex items-center justify-center text-xs font-semibold text-slate-600">
-                        {user.name.split(' ').map(n => n[0]).join('')}
+                        {user.name.split(' ').map((n: string) => n[0]).join('')}
                       </div>
                       <div>
                         <p className="text-xs font-medium text-slate-800">{user.name}</p>
@@ -141,7 +165,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
           {/* Alerts */}
           <Card title="Active Alerts" noPadding>
             <div className="divide-y divide-slate-50">
-              {ALERTS.filter(a => !a.read).map(alert => (
+              {alerts.filter(a => !a.read).map(alert => (
                 <div key={alert.id} className="flex gap-3 px-4 py-3">
                   <span className={`w-2 h-2 rounded-full flex-shrink-0 mt-1.5 ${
                     alert.type === 'critical' ? 'bg-red-500' :

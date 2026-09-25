@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MapPin, Truck, Clock, User, Package, Navigation, Phone, CheckCircle, Circle } from 'lucide-react';
 import { Badge, Card, PageHeader, Button, Table, Tr, Td } from '../components/ui';
-import { SHIPMENTS } from '../data/mockData';
+import { api } from '../lib/api';
+import { subscribeToResource } from '../lib/realtime';
 
 const TIMELINE = [
   { label: 'Order Confirmed', time: '09/23 07:30', done: true },
@@ -14,8 +15,19 @@ const TIMELINE = [
 ];
 
 export default function ShipmentDetails() {
+  const [shipments, setShipments] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState('SHP-2026-0841');
-  const shipment = SHIPMENTS.find(s => s.id === selectedId) ?? SHIPMENTS[0];
+
+  useEffect(() => {
+    const load = () => api<any[]>('/shipments').then(data => setShipments(data.map(item => ({ ...item, id: item.shipmentId || item._id })))).catch(console.error);
+    load();
+    return subscribeToResource('shipments', load);
+  }, []);
+
+  const shipment = shipments.find(item => item.id === selectedId) || shipments[0];
+  if (!shipment) {
+    return <div className="p-6 text-sm text-slate-500">Loading shipment data...</div>;
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-screen-xl fade-in">
@@ -35,7 +47,7 @@ export default function ShipmentDetails() {
         <div className="lg:col-span-1">
           <Card title="Shipments" noPadding>
             <div className="divide-y divide-slate-50">
-              {SHIPMENTS.map(s => (
+              {shipments.map(s => (
                 <button
                   key={s.id}
                   onClick={() => setSelectedId(s.id)}
@@ -162,7 +174,7 @@ export default function ShipmentDetails() {
             <Card title="Driver Information">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-semibold text-sm">
-                  {shipment.driver !== 'Pending' ? shipment.driver.split(' ').map(n => n[0]).join('') : '?'}
+                  {shipment.driver !== 'Pending' ? shipment.driver.split(' ').map((n: string) => n[0]).join('') : '?'}
                 </div>
                 <div>
                   <p className="font-semibold text-slate-800 text-sm">{shipment.driver === 'Pending' ? 'Unassigned' : shipment.driver}</p>

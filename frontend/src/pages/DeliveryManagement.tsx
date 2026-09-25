@@ -1,11 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Filter, Calendar, Truck, Clock } from 'lucide-react';
 import { Badge, Card, PageHeader, Button, Table, Tr, Td } from '../components/ui';
-import { DELIVERY_SCHEDULE, SHIPMENTS } from '../data/mockData';
+import { api } from '../lib/api';
+import { subscribeToResource } from '../lib/realtime';
 
 export default function DeliveryManagement() {
   const [view, setView] = useState<'schedule' | 'map'>('schedule');
   const [dateFilter, setDateFilter] = useState('today');
+  const [schedule, setSchedule] = useState<any[]>([]);
+
+  useEffect(() => {
+    const load = () => Promise.all([api<any[]>('/deliveries'), api<any[]>('/shipments')]).then(([deliveries, shipments]) => {
+      const shipmentById = new Map(shipments.map(item => [item._id, item]));
+      setSchedule(deliveries.map(delivery => {
+        const shipment = shipmentById.get(delivery.shipmentId);
+        return {
+          time: delivery.scheduledAt ? new Date(delivery.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--',
+          shipment: shipment?.shipmentId || delivery.shipmentId,
+          driver: delivery.driver || shipment?.driver || 'Pending Assignment',
+          destination: shipment?.destination || 'Unknown destination',
+          qty: shipment ? `${shipment.quantity.toLocaleString()} kg` : '--',
+          status: delivery.status,
+        };
+      }));
+    }).catch(console.error);
+    load();
+    const stopDeliveries = subscribeToResource('deliveries', load);
+    const stopShipments = subscribeToResource('shipments', load);
+    return () => { stopDeliveries(); stopShipments(); };
+  }, []);
 
   const drivers = [
     { name: 'Marcus Johnson', truck: 'TRK-224', status: 'active', deliveries: 1, location: 'I-35 N near Round Rock' },
@@ -58,7 +81,7 @@ export default function DeliveryManagement() {
           >
             {view === 'schedule' ? (
               <Table headers={['Time', 'Shipment', 'Driver', 'Destination', 'Quantity', 'Status']}>
-                {DELIVERY_SCHEDULE.map((row, i) => (
+                {schedule.map((row, i) => (
                   <Tr key={i}>
                     <Td>
                       <div className="flex items-center gap-2">
@@ -82,7 +105,7 @@ export default function DeliveryManagement() {
                 <div className="relative">
                   <div className="absolute left-16 top-0 bottom-0 w-0.5 bg-slate-100" />
                   <div className="space-y-1">
-                    {DELIVERY_SCHEDULE.map((row, i) => (
+                    {schedule.map((row, i) => (
                       <div key={i} className="flex items-start gap-4 py-2">
                         <span className="text-xs font-mono font-bold text-slate-500 w-12 text-right flex-shrink-0 pt-0.5">{row.time}</span>
                         <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-0.5 z-10 border-2 border-white ${

@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
 import { ShoppingCart, Package, Truck, Clock, TrendingUp, Star } from 'lucide-react';
 import { StatCard, Badge, Card, ProgressBar, PageHeader, Button, Table, Tr, Td } from '../components/ui';
-import { ORDERS, SHIPMENTS, REVENUE_CHART } from '../data/mockData';
+import { REVENUE_CHART } from '../data/mockData';
+import { api } from '../lib/api';
+import { subscribeToResource } from '../lib/realtime';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const CONSUMPTION = [
@@ -13,8 +16,22 @@ const CONSUMPTION = [
 ];
 
 export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any) => void }) {
-  const myShipments = SHIPMENTS.filter(s => s.customer === 'NorthEast Power' || s.status === 'transit').slice(0, 3);
-  const myOrders = ORDERS.slice(0, 4);
+  const [myShipments, setMyShipments] = useState<any[]>([]);
+  const [myOrders, setMyOrders] = useState<any[]>([]);
+
+  useEffect(() => {
+    const load = () => Promise.all([
+      api<any[]>('/orders'),
+      api<any[]>('/shipments'),
+    ]).then(([orders, shipments]) => {
+      setMyOrders(orders);
+      setMyShipments(shipments.filter(item => item.customer === 'NorthEast Power' || item.status === 'transit').slice(0, 3));
+    }).catch(console.error);
+    load();
+    const stopOrders = subscribeToResource('orders', load);
+    const stopShipments = subscribeToResource('shipments', load);
+    return () => { stopOrders(); stopShipments(); };
+  }, []);
 
   return (
     <div className="p-6 space-y-6 max-w-screen-xl fade-in">
@@ -30,8 +47,8 @@ export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any)
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Active Orders" value={3} icon={<ShoppingCart size={18} />} color="blue" />
-        <StatCard label="In Transit" value={2} icon={<Truck size={18} />} color="purple" />
+        <StatCard label="Active Orders" value={myOrders.filter(order => !['delivered', 'cancelled'].includes(order.status)).length} icon={<ShoppingCart size={18} />} color="blue" />
+        <StatCard label="In Transit" value={myShipments.filter(shipment => shipment.status === 'transit').length} icon={<Truck size={18} />} color="purple" />
         <StatCard label="Delivered (Sep)" value={8} icon={<Package size={18} />} color="green" />
         <StatCard label="Total Volume (YTD)" value="278.1" unit="t" change={12.4} changeLabel="vs 2025" icon={<TrendingUp size={18} />} color="amber" />
       </div>
@@ -64,7 +81,7 @@ export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any)
             <Table headers={['Order ID', 'Quantity', 'Delivery Date', 'Origin', 'Total', 'Status']}>
               {myOrders.map(order => (
                 <Tr key={order.id}>
-                  <Td><span className="font-mono text-xs font-semibold text-blue-600">{order.id}</span></Td>
+                  <Td><span className="font-mono text-xs font-semibold text-blue-600">{order.orderId || order.id}</span></Td>
                   <Td><span className="font-medium">{order.quantity.toLocaleString()}</span><span className="text-slate-400 text-xs ml-1">kg</span></Td>
                   <Td className="text-xs text-slate-600">{order.deliveryDate}</Td>
                   <Td className="text-xs text-slate-500">{order.origin}</Td>

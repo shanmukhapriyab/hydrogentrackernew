@@ -1,15 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bell, CheckCheck, Filter, AlertTriangle, CheckCircle, Info, X } from 'lucide-react';
 import { Card, PageHeader, Button } from '../components/ui';
-import { ALERTS } from '../data/mockData';
+import { api } from '../lib/api';
+import { subscribeToResource } from '../lib/realtime';
+
+type Alert = { _id?: string; id?: string; type: string; title: string; message: string; createdAt?: string; time?: string; read: boolean };
 
 export default function Notifications() {
   const [filter, setFilter] = useState<'all' | 'unread' | 'critical'>('all');
-  const [alerts, setAlerts] = useState(ALERTS);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+
+  useEffect(() => {
+    const load = () => api<Alert[]>('/notifications').then(setAlerts).catch(console.error);
+    load();
+    return subscribeToResource('notifications', load);
+  }, []);
 
   const markAllRead = () => setAlerts(a => a.map(x => ({ ...x, read: true })));
-  const dismiss = (id: string) => setAlerts(a => a.filter(x => x.id !== id));
-  const markRead = (id: string) => setAlerts(a => a.map(x => x.id === id ? { ...x, read: true } : x));
+  const getId = (alert: Alert) => alert._id || alert.id || alert.title;
+  const dismiss = (id: string) => setAlerts(a => a.filter(x => getId(x) !== id));
+  const markRead = (id: string) => setAlerts(a => a.map(x => getId(x) === id ? { ...x, read: true } : x));
 
   const filtered = alerts.filter(a =>
     filter === 'all' ? true :
@@ -82,7 +92,7 @@ export default function Notifications() {
           const style = TYPE_STYLES[alert.type] ?? TYPE_STYLES['info'];
           return (
             <div
-              key={alert.id}
+              key={getId(alert)}
               className={`flex items-start gap-4 p-4 rounded-xl border-l-4 ${style.bg} ${style.border} ${!alert.read ? 'ring-1 ring-inset ring-slate-200' : 'opacity-70'} transition-all`}
             >
               <div className={`w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0 shadow-sm`}>
@@ -97,7 +107,7 @@ export default function Notifications() {
                   <div className="flex items-center gap-1 flex-shrink-0">
                     {!alert.read && (
                       <button
-                        onClick={() => markRead(alert.id)}
+                        onClick={() => markRead(getId(alert))}
                         className="text-xs text-slate-400 hover:text-blue-600 transition-colors"
                         title="Mark as read"
                       >
@@ -105,7 +115,7 @@ export default function Notifications() {
                       </button>
                     )}
                     <button
-                      onClick={() => dismiss(alert.id)}
+                      onClick={() => dismiss(getId(alert))}
                       className="text-xs text-slate-400 hover:text-red-500 transition-colors"
                       title="Dismiss"
                     >
