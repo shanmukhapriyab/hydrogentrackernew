@@ -30,12 +30,6 @@ import {
   Td
 } from '../components/ui';
 
-import {
-  PRODUCTION_CHART,
-  REVENUE_CHART,
-  ALERTS,
-  STORAGE_TANKS
-} from '../data/mockData';
 import { api } from '../lib/api';
 import { subscribeToResource } from '../lib/realtime';
 
@@ -50,12 +44,18 @@ type Production = {
   status: 'active' | 'completed' | 'pending';
 };
 
+type Notification = { _id: string; type: string; title: string; read: boolean; createdAt?: string };
+type Storage = { _id: string; facilityName: string; tankId: string; capacityKg: number; currentLevelKg: number; status: string; fillPercent?: number };
+
 export default function ProducerDashboard({
   onNavigate
 }: {
   onNavigate: (p: any) => void;
 }) {
   const [productions, setProductions] = useState<Production[]>([]);
+  const [alerts, setAlerts] = useState<Notification[]>([]);
+  const [storage, setStorage] = useState<Storage[]>([]);
+  const [analytics, setAnalytics] = useState<any>({ productionTrend: [], revenueTrend: [] });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -71,7 +71,17 @@ export default function ProducerDashboard({
     };
 
     fetchProductions();
-    return subscribeToResource('production', fetchProductions);
+    const loadAnalytics = () => api<any>('/analytics/summary').then(setAnalytics).catch(console.error);
+    const loadAlerts = () => api<Notification[]>('/notifications').then(setAlerts).catch(console.error);
+    const loadStorage = () => api<Storage[]>('/storage').then(setStorage).catch(console.error);
+    loadAnalytics();
+    loadAlerts();
+    loadStorage();
+    const stopProduction = subscribeToResource('production', fetchProductions);
+    const stopAnalytics = subscribeToResource('production', loadAnalytics);
+    const stopAlerts = subscribeToResource('notifications', loadAlerts);
+    const stopStorage = subscribeToResource('storage', loadStorage);
+    return () => { stopProduction(); stopAnalytics(); stopAlerts(); stopStorage(); };
   }, []);
 
   const totalOutputKg = productions.reduce(
@@ -166,7 +176,7 @@ export default function ProducerDashboard({
         >
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart
-              data={PRODUCTION_CHART}
+              data={analytics.productionTrend}
               margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
             >
               <defs>
@@ -239,7 +249,7 @@ export default function ProducerDashboard({
         >
           <ResponsiveContainer width="100%" height={220}>
             <BarChart
-              data={REVENUE_CHART}
+              data={analytics.revenueTrend}
               margin={{ top: 4, right: 4, bottom: 0, left: -20 }}
             >
               <CartesianGrid
@@ -368,9 +378,9 @@ export default function ProducerDashboard({
             noPadding
           >
             <div className="divide-y divide-slate-50">
-              {ALERTS.slice(0, 5).map(alert => (
+              {alerts.slice(0, 5).map(alert => (
                 <div
-                  key={alert.id}
+                  key={alert._id}
                   className={`flex gap-3 px-4 py-3 ${
                     alert.read ? 'opacity-60' : ''
                   }`}
@@ -393,7 +403,7 @@ export default function ProducerDashboard({
                     </p>
 
                     <p className="text-xs text-slate-400 mt-0.5 truncate">
-                      {alert.time}
+                      {alert.createdAt ? new Date(alert.createdAt).toLocaleString() : 'Recently'}
                     </p>
                   </div>
                 </div>
@@ -418,25 +428,25 @@ export default function ProducerDashboard({
         noPadding
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-0 divide-x divide-y divide-slate-100">
-          {STORAGE_TANKS.map(tank => {
+          {storage.map(tank => {
             const pct = Math.round(
-              (tank.current / tank.capacity) * 100
+              (tank.currentLevelKg / tank.capacityKg) * 100
             );
 
             return (
               <div
-                key={tank.id}
+                key={tank._id}
                 className="p-4 hover:bg-slate-50 transition-colors cursor-pointer"
                 onClick={() => onNavigate('storage')}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <p className="text-xs font-medium text-slate-700 leading-tight">
-                      {tank.location}
+                      {tank.facilityName}
                     </p>
 
                     <p className="text-xs text-slate-400">
-                      {tank.id}
+                      {tank.tankId}
                     </p>
                   </div>
 
@@ -448,14 +458,14 @@ export default function ProducerDashboard({
                 </p>
 
                 <ProgressBar
-                  value={tank.current}
-                  max={tank.capacity}
+                  value={tank.currentLevelKg}
+                  max={tank.capacityKg}
                   size="sm"
                 />
 
                 <p className="text-xs text-slate-400 mt-1">
-                  {tank.current.toLocaleString()} /{' '}
-                  {tank.capacity.toLocaleString()} kg
+                  {tank.currentLevelKg.toLocaleString()} /{' '}
+                  {tank.capacityKg.toLocaleString()} kg
                 </p>
               </div>
             );

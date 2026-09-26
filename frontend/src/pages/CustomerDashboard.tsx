@@ -1,31 +1,24 @@
 import { useEffect, useState } from 'react';
 import { ShoppingCart, Package, Truck, Clock, TrendingUp, Star } from 'lucide-react';
 import { StatCard, Badge, Card, ProgressBar, PageHeader, Button, Table, Tr, Td } from '../components/ui';
-import { REVENUE_CHART } from '../data/mockData';
 import { api } from '../lib/api';
 import { subscribeToResource } from '../lib/realtime';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const CONSUMPTION = [
-  { month: 'Apr', ordered: 12400, delivered: 12100 },
-  { month: 'May', ordered: 13800, delivered: 13500 },
-  { month: 'Jun', ordered: 15200, delivered: 14900 },
-  { month: 'Jul', ordered: 14600, delivered: 14300 },
-  { month: 'Aug', ordered: 16200, delivered: 15800 },
-  { month: 'Sep', ordered: 17500, delivered: 11200 },
-];
-
 export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any) => void }) {
   const [myShipments, setMyShipments] = useState<any[]>([]);
   const [myOrders, setMyOrders] = useState<any[]>([]);
+  const [consumption, setConsumption] = useState<any[]>([]);
 
   useEffect(() => {
     const load = () => Promise.all([
       api<any[]>('/orders'),
       api<any[]>('/shipments'),
-    ]).then(([orders, shipments]) => {
+      api<any>('/analytics/summary'),
+    ]).then(([orders, shipments, summary]) => {
       setMyOrders(orders);
       setMyShipments(shipments.filter(item => item.customer === 'NorthEast Power' || item.status === 'transit').slice(0, 3));
+      setConsumption(summary.consumption || []);
     }).catch(console.error);
     load();
     const stopOrders = subscribeToResource('orders', load);
@@ -58,7 +51,7 @@ export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any)
         <div className="lg:col-span-2 space-y-4">
           <Card title="Consumption Trend" subtitle="Monthly hydrogen volume (kg)">
             <ResponsiveContainer width="100%" height={200}>
-              <AreaChart data={CONSUMPTION} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
+              <AreaChart data={consumption} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
                 <defs>
                   <linearGradient id="gradC1" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1} />
@@ -129,9 +122,9 @@ export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any)
           <Card title="Active Shipments" noPadding>
             <div className="divide-y divide-slate-50">
               {myShipments.map(s => (
-                <div key={s.id} className="px-4 py-3">
+                <div key={s._id} className="px-4 py-3">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="font-mono text-xs font-bold text-blue-600">{s.id.slice(-4)}</span>
+                    <span className="font-mono text-xs font-bold text-blue-600">{(s.shipmentId || s._id).slice(-4)}</span>
                     <Badge status={s.status as any} />
                   </div>
                   <p className="text-xs text-slate-600 mb-1">{s.destination}</p>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Users, Factory, Truck, DollarSign, AlertTriangle, TrendingUp, Shield, Activity } from 'lucide-react';
 import { StatCard, Badge, Card, ProgressBar, PageHeader, Button, Table, Tr, Td } from '../components/ui';
-import { PLANTS, SHIPMENTS, PRODUCTION_CHART, REVENUE_CHART } from '../data/mockData';
 import { api } from '../lib/api';
 import { subscribeToResource } from '../lib/realtime';
 import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
@@ -15,17 +14,12 @@ const SYSTEM_METRICS = [
   { label: 'DB Connections', value: '124/500', ok: true },
 ];
 
-const PIE_DATA = [
-  { name: 'Green H₂', value: 68.4 },
-  { name: 'Blue H₂', value: 21.2 },
-  { name: 'Gray H₂', value: 10.4 },
-];
 const PIE_COLORS = ['#2563eb', '#10b981', '#94a3b8'];
 
 export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) => void }) {
   const [users, setUsers] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
-  const [summary, setSummary] = useState<any>({ totals: {}, status: {} });
+  const [summary, setSummary] = useState<any>({ totals: {}, status: {}, revenueTrend: [], productMix: [], forecast: [] });
 
   useEffect(() => {
     const load = () => Promise.all([
@@ -73,7 +67,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
         <div className="lg:col-span-2">
           <Card title="Revenue vs Cost" subtitle="Monthly comparison — last 6 months">
             <ResponsiveContainer width="100%" height={220}>
-              <ComposedChart data={REVENUE_CHART} margin={{ top: 4, right: 4, bottom: 0, left: -15 }}>
+              <ComposedChart data={summary.revenueTrend || []} margin={{ top: 4, right: 4, bottom: 0, left: -15 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                 <XAxis dataKey="month" tick={{ fontSize: 12, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1e6).toFixed(1)}M`} />
@@ -92,17 +86,17 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
             <div style={{ height: 180 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={PIE_DATA} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
-                    {PIE_DATA.map((entry, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
+                  <Pie data={summary.productMix || []} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
+                    {(summary.productMix || []).map((entry: any, i: number) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                   </Pie>
                   <Tooltip contentStyle={{ border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} formatter={(v: any) => [`${v}%`]} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
             <div className="mt-3 space-y-2">
-              {PIE_DATA.map((d, i) => (
+              {(summary.productMix || []).map((d: any, i: number) => (
                 <div key={d.name} className="flex items-center gap-2 text-xs">
-                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: PIE_COLORS[i] }} />
+                  <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: PIE_COLORS[i % PIE_COLORS.length] }} />
                   <span className="text-slate-600 flex-1">{d.name}</span>
                   <span className="font-semibold text-slate-800">{d.value}%</span>
                 </div>

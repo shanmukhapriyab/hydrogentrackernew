@@ -1,32 +1,53 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Search, Filter, RefreshCw, Settings, ChevronDown } from 'lucide-react';
 import { StatCard, Badge, Card, ProgressBar, PageHeader, Button, Table, Tr, Td } from '../components/ui';
-import { PLANTS } from '../data/mockData';
+import { api } from '../lib/api';
+import { subscribeToResource } from '../lib/realtime';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
-const HOURLY = [
-  { h: '00:00', output: 88 }, { h: '02:00', output: 91 }, { h: '04:00', output: 87 },
-  { h: '06:00', output: 94 }, { h: '08:00', output: 98 }, { h: '10:00', output: 102 },
-  { h: '12:00', output: 105 }, { h: '14:00', output: 108 }, { h: '16:00', output: 104 },
-  { h: '18:00', output: 99 }, { h: '20:00', output: 95 }, { h: '22:00', output: 90 },
-];
-
-const PLANT_DETAILS = {
-  'PLT-001': {
-    stacks: 24, temperature: 68, pressure: 30.4, powerConsumption: 4.8, waterConsumption: 9.2, certifications: ['ISO 9001', 'ISO 14001'],
-    nextMaintenance: '2026-10-15', lastInspection: '2026-08-20',
-  },
-};
+type Production = { _id: string; plantId: string; plantName?: string; location?: string; technology?: string; capacityKg?: number; quantityKg: number; purity: number; costPerKg?: number; energySource: string; uptime?: number; status: string };
 
 export default function ProductionManagement() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [selectedPlant, setSelectedPlant] = useState(PLANTS[0]);
+  const [productions, setProductions] = useState<Production[]>([]);
+  const [selectedPlantId, setSelectedPlantId] = useState('');
 
-  const filtered = PLANTS.filter(p =>
+  useEffect(() => {
+    const load = () => api<Production[]>('/production').then(data => {
+      setProductions(data);
+      if (!selectedPlantId && data[0]) setSelectedPlantId(data[0].plantId);
+    }).catch(console.error);
+    load();
+    return subscribeToResource('production', load);
+  }, [selectedPlantId]);
+
+  const plants = productions.map(production => ({
+    ...production,
+    id: production.plantId,
+    name: production.plantName || production.plantId,
+    location: production.location || 'Unknown location',
+    capacity: (production.capacityKg || production.quantityKg) / 1000,
+    output: production.quantityKg / 1000,
+    efficiency: production.purity,
+    uptime: production.uptime || 0,
+    type: production.technology || 'Electrolyzer',
+  }));
+  const selectedPlant = plants.find(plant => plant.id === selectedPlantId) || plants[0];
+  const hourly = productions.map((production, index) => ({
+    h: production.plantId,
+    output: Math.round(production.quantityKg / 1000),
+    index,
+  }));
+
+  const filtered = plants.filter(p =>
     (statusFilter === 'all' || p.status === statusFilter) &&
     (p.name.toLowerCase().includes(search.toLowerCase()) || p.location.toLowerCase().includes(search.toLowerCase()))
   );
+
+  if (!selectedPlant) {
+    return <div className="p-6 text-sm text-slate-500">Loading production data...</div>;
+  }
 
   return (
     <div className="p-6 space-y-6 max-w-screen-xl fade-in">
@@ -42,10 +63,10 @@ export default function ProductionManagement() {
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Plants" value={PLANTS.length} icon={<Settings size={18} />} color="blue" />
-        <StatCard label="Active" value={PLANTS.filter(p => p.status === 'active').length} icon={<Settings size={18} />} color="green" />
-        <StatCard label="In Maintenance" value={PLANTS.filter(p => p.status === 'maintenance').length} icon={<Settings size={18} />} color="amber" />
-        <StatCard label="Total Daily Output" value="606.5" unit="t/day" change={2.8} changeLabel="vs avg" icon={<Settings size={18} />} color="purple" />
+        <StatCard label="Total Plants" value={plants.length} icon={<Settings size={18} />} color="blue" />
+        <StatCard label="Active" value={plants.filter(p => p.status === 'active').length} icon={<Settings size={18} />} color="green" />
+        <StatCard label="In Maintenance" value={plants.filter(p => p.status === 'maintenance').length} icon={<Settings size={18} />} color="amber" />
+        <StatCard label="Total Daily Output" value={plants.reduce((sum, plant) => sum + plant.output, 0).toFixed(1)} unit="t/day" icon={<Settings size={18} />} color="purple" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -68,7 +89,7 @@ export default function ProductionManagement() {
               {filtered.map(plant => (
                 <button
                   key={plant.id}
-                  onClick={() => setSelectedPlant(plant)}
+                  onClick={() => setSelectedPlantId(plant.id)}
                   className={`w-full text-left px-4 py-3.5 transition-colors ${selectedPlant.id === plant.id ? 'bg-blue-50' : 'hover:bg-slate-50'}`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -143,10 +164,10 @@ export default function ProductionManagement() {
               {[
                 { label: 'Electrolyzer Type', value: selectedPlant.type },
                 { label: 'Location', value: selectedPlant.location },
-                { label: 'Power Consumption', value: '4.8 kWh/Nm³' },
-                { label: 'Water Consumption', value: '9.2 L/kg H₂' },
-                { label: 'Next Maintenance', value: '2026-10-15' },
-                { label: 'Last Inspection', value: '2026-08-20' },
+                { label: 'Energy Source', value: selectedPlant.energySource },
+                { label: 'Cost per kg', value: `${selectedPlant.costPerKg || 'N/A'} USD` },
+                { label: 'Next Maintenance', value: 'Not scheduled' },
+                { label: 'Last Inspection', value: 'Not reported' },
               ].map(item => (
                 <div key={item.label} className="flex items-center justify-between text-xs">
                   <span className="text-slate-500">{item.label}</span>
@@ -158,7 +179,7 @@ export default function ProductionManagement() {
 
           <Card title="Hourly Output Today" subtitle="tonnes/day equivalent">
             <ResponsiveContainer width="100%" height={180}>
-              <LineChart data={HOURLY} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+              <LineChart data={hourly} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                 <XAxis dataKey="h" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                 <YAxis domain={[80, 115]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
