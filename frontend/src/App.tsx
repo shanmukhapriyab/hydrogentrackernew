@@ -64,39 +64,6 @@ export default function App() {
       return;
     }
 
-    const rolePageMap: Record<Page, UserRole | null> = {
-      'admin-dashboard': 'admin',
-      'user-management': 'admin',
-
-      'producer-dashboard': 'producer',
-
-      'production': null,
-      'storage': null,
-
-      'logistics': 'logistics',
-      'shipment-details': null,
-      'delivery': null,
-
-      'customer-dashboard': 'customer',
-      'place-order': 'customer',
-
-      'reports': null,
-      'profile': null,
-      'notifications': null,
-
-      'loading': null,
-      'empty': null,
-      'error': null,
-
-      'login': null,
-    };
-
-    const mappedRole = rolePageMap[newPage];
-
-    if (mappedRole) {
-      setRole(mappedRole);
-    }
-
     setPage(newPage);
   };
 

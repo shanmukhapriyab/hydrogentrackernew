@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Factory, Database, Truck, Package, Users,
   BarChart3, Settings, Bell, LogOut, ChevronRight, Menu, X,
-  Zap, ShoppingCart, MapPin, User, ChevronDown
+  Zap, ShoppingCart, MapPin, ChevronDown
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { subscribeToResource } from '../lib/realtime';
@@ -157,28 +157,13 @@ export default function Layout({ currentPage, onNavigate, userRole, children }: 
           })}
         </nav>
 
-        {/* View switcher */}
         <div className="px-3 py-3 border-t border-slate-100 flex-shrink-0">
-          <p className="text-xs font-medium text-slate-400 px-3 mb-2">Switch View</p>
-          <div className="space-y-0.5">
-            {(['admin', 'producer', 'logistics', 'customer'] as UserRole[]).map(role => (
-              <button
-                key={role}
-                onClick={() => {
-                  const firstPage = NAV_ITEMS[role][0].page;
-                  onNavigate(firstPage);
-                  // We need to signal role change - handled via page navigation
-                }}
-                className={`w-full flex items-center gap-2 px-3 py-1.5 rounded text-xs transition-all
-                  ${userRole === role ? 'text-blue-700 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
-              >
-                <User size={12} />
-                {ROLE_LABELS[role]}
-              </button>
-            ))}
-          </div>
           <button
-            onClick={() => onNavigate('login')}
+            onClick={() => {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              onNavigate('login');
+            }}
             className="w-full flex items-center gap-2 px-3 py-2 mt-2 rounded-lg text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all"
           >
             <LogOut size={15} />
