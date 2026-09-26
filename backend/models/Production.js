@@ -7,6 +7,12 @@ const productionSchema = new mongoose.Schema(
       required: true
     },
 
+    plantName: String,
+    location: String,
+    capacityKg: { type: Number, min: 0 },
+    technology: String,
+    uptime: { type: Number, min: 0, max: 100 },
+
     batchId: {
       type: String,
       required: true,

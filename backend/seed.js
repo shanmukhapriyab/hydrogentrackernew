@@ -35,9 +35,9 @@ async function seed() {
 
   await Production.deleteMany({});
   await Production.insertMany([
-    { plantId: 'PLT-001', batchId: 'BATCH-2026-0901', quantityKg: 98400, purity: 99.97, energySource: 'solar', costPerKg: 4.8, status: 'active' },
-    { plantId: 'PLT-002', batchId: 'BATCH-2026-0902', quantityKg: 71200, purity: 99.94, energySource: 'wind', costPerKg: 4.4, status: 'active' },
-    { plantId: 'PLT-003', batchId: 'BATCH-2026-0903', quantityKg: 168500, purity: 99.99, energySource: 'solar', costPerKg: 4.2, status: 'completed' },
+    { plantId: 'PLT-001', plantName: 'Green Valley Electrolyzer', location: 'Houston, TX', technology: 'PEM', capacityKg: 120000, uptime: 99.1, batchId: 'BATCH-2026-0901', quantityKg: 98400, purity: 99.97, energySource: 'solar', costPerKg: 4.8, status: 'active' },
+    { plantId: 'PLT-002', plantName: 'Sunrise H2 Facility', location: 'Phoenix, AZ', technology: 'Alkaline', capacityKg: 85000, uptime: 97.6, batchId: 'BATCH-2026-0902', quantityKg: 71200, purity: 99.94, energySource: 'wind', costPerKg: 4.4, status: 'active' },
+    { plantId: 'PLT-003', plantName: 'Pacific Hydrogen Works', location: 'Los Angeles, CA', technology: 'PEM', capacityKg: 200000, uptime: 98.2, batchId: 'BATCH-2026-0903', quantityKg: 168500, purity: 99.99, energySource: 'solar', costPerKg: 4.2, status: 'completed' },
   ]);
   await Storage.deleteMany({});
   await Storage.insertMany([
