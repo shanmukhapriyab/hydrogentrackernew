@@ -50,11 +50,13 @@ router.get('/summary', async (req, res) => {
     alkaline: item.technology === 'Alkaline' ? item.purity : 0,
     soec: item.technology === 'SOEC' ? item.purity : 0,
   }));
-  const productMix = Object.entries(production.reduce((result, item) => {
+  const productTotals = production.reduce((result, item) => {
     const label = item.energySource === 'grid' ? 'Grid H2' : 'Green H2';
     result[label] = (result[label] || 0) + item.quantityKg;
     return result;
-  }, {})).map(([name, value]) => ({ name, value }));
+  }, {});
+  const productTotal = Object.values(productTotals).reduce((sum, value) => sum + value, 0);
+  const productMix = Object.entries(productTotals).map(([name, value]) => ({ name, value: productTotal ? Math.round((value / productTotal) * 1000) / 10 : 0 }));
   res.json({
     totals: { outputKg, capacityKg, currentKg, productionCount: production.length, shipmentCount: shipments.length, orderCount: orders.length },
     status: {
