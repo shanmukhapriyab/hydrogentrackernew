@@ -31,12 +31,6 @@ export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any)
       <PageHeader
         title="Customer Dashboard"
         subtitle="NorthEast Power — Account Overview"
-        actions={
-          <>
-            <Button variant="secondary" size="sm">Download Invoice</Button>
-            <Button size="sm" onClick={() => onNavigate('place-order')}><ShoppingCart size={13} />Place Order</Button>
-          </>
-        }
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -68,9 +62,7 @@ export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any)
             </ResponsiveContainer>
           </Card>
 
-          <Card title="Recent Orders" noPadding actions={
-            <Button size="sm" onClick={() => onNavigate('place-order')}>New Order</Button>
-          }>
+          <Card title="Recent Orders" noPadding>
             <Table headers={['Order ID', 'Quantity', 'Delivery Date', 'Origin', 'Total', 'Status']}>
               {myOrders.map(order => (
                 <Tr key={order.id}>

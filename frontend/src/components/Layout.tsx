@@ -52,7 +52,6 @@ const NAV_ITEMS: Record<UserRole, { label: string; page: Page; icon: React.FC<{ 
   ],
   customer: [
     { label: 'Dashboard', page: 'customer-dashboard', icon: LayoutDashboard },
-    { label: 'Place Order', page: 'place-order', icon: ShoppingCart },
     { label: 'Shipment Tracking', page: 'shipment-details', icon: MapPin },
     { label: 'Notifications', page: 'notifications', icon: Bell },
     { label: 'Profile', page: 'profile', icon: Settings },
