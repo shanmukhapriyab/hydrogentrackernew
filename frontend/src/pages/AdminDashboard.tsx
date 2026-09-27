@@ -46,12 +46,6 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
       <PageHeader
         title="Admin Dashboard"
         subtitle="Platform-wide operations and system health overview"
-        actions={
-          <>
-            <Button variant="secondary" size="sm"><Shield size={13} />Security Report</Button>
-            <Button size="sm"><Activity size={13} />System Status</Button>
-          </>
-        }
       />
 
       {/* KPI row */}
