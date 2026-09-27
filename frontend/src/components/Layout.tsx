@@ -36,7 +36,6 @@ const NAV_ITEMS: Record<UserRole, { label: string; page: Page; icon: React.FC<{ 
   ],
   producer: [
     { label: 'Dashboard', page: 'producer-dashboard', icon: LayoutDashboard },
-    { label: 'Production', page: 'production', icon: Factory },
     { label: 'Storage', page: 'storage', icon: Database },
     { label: 'Reports', page: 'reports', icon: BarChart3 },
     { label: 'Notifications', page: 'notifications', icon: Bell },

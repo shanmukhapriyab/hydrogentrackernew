@@ -108,18 +108,6 @@ export default function ProducerDashboard({
       <PageHeader
         title="Producer Dashboard"
         subtitle="September 23, 2026 — Real-time production overview"
-        actions={
-          <>
-            <Button variant="secondary" size="sm">
-              Export Report
-            </Button>
-
-            <Button size="sm">
-              <Zap size={13} />
-              Live Mode
-            </Button>
-          </>
-        }
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
