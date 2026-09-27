@@ -34,12 +34,6 @@ export default function ShipmentDetails() {
       <PageHeader
         title="Shipment Tracking"
         subtitle="Real-time shipment status and route information"
-        actions={
-          <>
-            <Button variant="secondary" size="sm">Download POD</Button>
-            <Button size="sm">Contact Driver</Button>
-          </>
-        }
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
