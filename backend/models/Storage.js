@@ -61,7 +61,11 @@ const storageSchema = new mongoose.Schema(
       type: String,
       enum: ['normal', 'warning', 'critical'],
       default: 'normal'
-    }
+    },
+
+    refillScheduledAt: Date,
+    lastRefillAt: Date,
+    lastAlertAt: Date
   },
   {
     timestamps: true
