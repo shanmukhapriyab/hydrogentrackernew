@@ -8,10 +8,16 @@ export default function DeliveryManagement() {
   const [view, setView] = useState<'schedule' | 'map'>('schedule');
   const [dateFilter, setDateFilter] = useState('today');
   const [schedule, setSchedule] = useState<any[]>([]);
+  const [shipments, setShipments] = useState<any[]>([]);
+  const [showNewDelivery, setShowNewDelivery] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [deliveryForm, setDeliveryForm] = useState({ shipmentId: '', driver: '', truck: '', scheduledAt: '' });
 
   useEffect(() => {
-    const load = () => Promise.all([api<any[]>('/deliveries'), api<any[]>('/shipments')]).then(([deliveries, shipments]) => {
-      const shipmentById = new Map(shipments.map(item => [item._id, item]));
+    const load = () => Promise.all([api<any[]>('/deliveries'), api<any[]>('/shipments')]).then(([deliveries, shipmentData]) => {
+      setShipments(shipmentData);
+      const shipmentById = new Map(shipmentData.map(item => [item._id, item]));
       setSchedule(deliveries.map(delivery => {
         const shipment = shipmentById.get(delivery.shipmentId);
         return {
@@ -29,6 +35,30 @@ export default function DeliveryManagement() {
     const stopShipments = subscribeToResource('shipments', load);
     return () => { stopDeliveries(); stopShipments(); };
   }, []);
+
+  const createDelivery = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSaving(true);
+    setFormError('');
+    try {
+      await api('/deliveries', {
+        method: 'POST',
+        body: JSON.stringify({
+          shipmentId: deliveryForm.shipmentId,
+          driver: deliveryForm.driver,
+          truck: deliveryForm.truck,
+          scheduledAt: deliveryForm.scheduledAt ? new Date(deliveryForm.scheduledAt).toISOString() : undefined,
+          status: 'pending',
+        }),
+      });
+      setDeliveryForm({ shipmentId: '', driver: '', truck: '', scheduledAt: '' });
+      setShowNewDelivery(false);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Unable to create delivery');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const drivers = [
     { name: 'Marcus Johnson', truck: 'TRK-224', status: 'active', deliveries: 1, location: 'I-35 N near Round Rock' },
@@ -57,10 +87,37 @@ export default function DeliveryManagement() {
                 </button>
               ))}
             </div>
-            <Button size="sm"><Plus size={13} />New Delivery</Button>
+            <Button size="sm" onClick={() => setShowNewDelivery(true)}><Plus size={13} />New Delivery</Button>
           </>
         }
       />
+
+      {showNewDelivery && (
+        <Card title="New Delivery" subtitle="Schedule a delivery for an existing shipment">
+          <form onSubmit={createDelivery} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <label className="text-xs text-slate-500">
+              Shipment
+              <select required value={deliveryForm.shipmentId} onChange={event => setDeliveryForm(current => ({ ...current, shipmentId: event.target.value }))} className="mt-1 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-800">
+                <option value="">Select shipment</option>
+                {shipments.map(shipment => <option key={shipment._id} value={shipment._id}>{shipment.shipmentId} · {shipment.destination}</option>)}
+              </select>
+            </label>
+            {[
+              ['driver', 'Driver', 'text'], ['truck', 'Truck', 'text'], ['scheduledAt', 'Scheduled time', 'datetime-local'],
+            ].map(([field, label, type]) => (
+              <label key={field} className="text-xs text-slate-500">
+                {label}
+                <input required={field !== 'truck'} type={type} value={deliveryForm[field as keyof typeof deliveryForm]} onChange={event => setDeliveryForm(current => ({ ...current, [field]: event.target.value }))} className="mt-1 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-800" />
+              </label>
+            ))}
+            {formError && <p className="sm:col-span-2 lg:col-span-4 text-sm text-red-600">{formError}</p>}
+            <div className="sm:col-span-2 lg:col-span-4 flex gap-2">
+              <Button type="submit" size="sm" disabled={saving}>{saving ? 'Saving...' : 'Save Delivery'}</Button>
+              <Button type="button" variant="secondary" size="sm" onClick={() => setShowNewDelivery(false)}>Cancel</Button>
+            </div>
+          </form>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Schedule */}
