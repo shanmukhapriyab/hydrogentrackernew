@@ -476,16 +476,14 @@ export default function StorageManagement() {
                   View History
                 </Button>
 
-                {selected.status === 'critical' && (
-                  <Button
-                    variant="danger"
-                    size="sm"
-                    onClick={raiseEmergencyAlert}
-                  >
-                    <AlertTriangle size={13} />
-                    Emergency Alert
-                  </Button>
-                )}
+                <Button
+                  variant="danger"
+                  size="sm"
+                  onClick={raiseEmergencyAlert}
+                >
+                  <AlertTriangle size={13} />
+                  Emergency Alert
+                </Button>
 
               </div>
 
