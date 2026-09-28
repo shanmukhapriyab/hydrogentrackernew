@@ -117,16 +117,10 @@ export default function StorageManagement() {
         title="Storage Management"
         subtitle="Monitor and manage hydrogen storage facilities"
         actions={
-          <>
-            <Button variant="secondary" size="sm">
-              Export
-            </Button>
-
-            <Button size="sm">
-              <Plus size={13} />
-              Add Tank
-            </Button>
-          </>
+          <Button size="sm">
+            <Plus size={13} />
+            Add Tank
+          </Button>
         }
       />
 
@@ -386,13 +380,6 @@ export default function StorageManagement() {
                   size="sm"
                 >
                   View History
-                </Button>
-
-                <Button
-                  variant="secondary"
-                  size="sm"
-                >
-                  Download Report
                 </Button>
 
                 {selected.status === 'critical' && (

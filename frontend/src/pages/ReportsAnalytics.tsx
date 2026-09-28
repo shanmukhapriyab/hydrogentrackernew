@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Download, Filter, TrendingUp, BarChart3, FileText } from 'lucide-react';
+import { TrendingUp, BarChart3, FileText } from 'lucide-react';
 import { Card, PageHeader, Button } from '../components/ui';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis,
@@ -52,7 +52,6 @@ export default function ReportsAnalytics() {
                 </button>
               ))}
             </div>
-            <Button size="sm"><Download size={13} />Export All</Button>
           </>
         }
       />
@@ -181,9 +180,7 @@ export default function ReportsAnalytics() {
                   <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
                   Generating...
                 </div>
-              ) : (
-                <Button variant="secondary" size="sm"><Download size={12} />Download</Button>
-              )}
+              ) : null}
             </div>
           ))}
         </div>
