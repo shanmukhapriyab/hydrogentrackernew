@@ -25,7 +25,6 @@ interface LayoutProps {
 const NAV_ITEMS: Record<UserRole, { label: string; page: Page; icon: React.FC<{ size?: number; className?: string }> }[]> = {
   admin: [
     { label: 'Admin Dashboard', page: 'admin-dashboard', icon: LayoutDashboard },
-    { label: 'User Management', page: 'user-management', icon: Users },
     { label: 'Production', page: 'production', icon: Factory },
     { label: 'Storage', page: 'storage', icon: Database },
     { label: 'Logistics', page: 'logistics', icon: Truck },

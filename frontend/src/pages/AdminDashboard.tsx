@@ -103,9 +103,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent users */}
         <div className="lg:col-span-2">
-          <Card title="User Activity" noPadding actions={
-            <Button size="sm" onClick={() => onNavigate('user-management')}>Manage Users</Button>
-          }>
+          <Card title="User Activity" noPadding>
             <Table headers={['User', 'Role', 'Last Active', 'Status', '']}>
               {users.map(user => (
                 <Tr key={user.id}>
