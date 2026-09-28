@@ -55,10 +55,7 @@ export default function ProductionManagement() {
         title="Production Management"
         subtitle="Monitor and control hydrogen production facilities"
         actions={
-          <>
-            <Button variant="secondary" size="sm"><RefreshCw size={13} />Refresh</Button>
-            <Button size="sm"><Plus size={13} />Add Plant</Button>
-          </>
+          <Button variant="secondary" size="sm"><RefreshCw size={13} />Refresh</Button>
         }
       />
 
