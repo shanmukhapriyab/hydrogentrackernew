@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { TrendingUp, BarChart3, FileText } from 'lucide-react';
+import { Download, TrendingUp, BarChart3, FileText } from 'lucide-react';
 import { Card, PageHeader, Button } from '../components/ui';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line, XAxis, YAxis,
@@ -34,6 +34,24 @@ export default function ReportsAnalytics() {
   }));
   const efficiencyData = analytics.efficiency || [];
   const regionData = analytics.regionData || [];
+
+  const downloadReport = (reportName: string) => {
+    const rows: Record<string, string | number>[] = monthly.map((item: any) => ({
+      period: item.month,
+      productionKg: item.actual || 0,
+      deliveriesKg: item.deliveries || 0,
+      revenue: item.revenue || 0,
+    }));
+    const headers = ['period', 'productionKg', 'deliveriesKg', 'revenue'];
+    const csv = [headers.join(','), ...rows.map(row => headers.map(header => row[header as keyof typeof row]).join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${reportName.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   const tabs = ['overview', 'production', 'logistics', 'financial', 'reports'];
 
@@ -180,7 +198,11 @@ export default function ReportsAnalytics() {
                   <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
                   Generating...
                 </div>
-              ) : null}
+              ) : (
+                <Button variant="secondary" size="sm" onClick={() => downloadReport(report.name)}>
+                  <Download size={12} />Download
+                </Button>
+              )}
             </div>
           ))}
         </div>

@@ -39,6 +39,8 @@ export default function StorageManagement() {
   const [showAddTank, setShowAddTank] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
+  const [actionMessage, setActionMessage] = useState('');
+  const [history, setHistory] = useState<{ type: string; at: string; message: string }[]>([]);
   const [tankForm, setTankForm] = useState({
     facilityName: '', tankId: '', capacityKg: '', currentLevelKg: '',
     pressureBar: '', temperatureC: '', safetyThresholdPct: '20', lat: '', lng: '',
@@ -116,6 +118,35 @@ export default function StorageManagement() {
       Add Tank
     </Button>
   );
+
+  const scheduleRefill = async () => {
+    if (!selected) return;
+    try {
+      await api(`/storage/${selected._id}/refill`, { method: 'POST', body: JSON.stringify({}) });
+      setActionMessage('Refill scheduled successfully.');
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : 'Unable to schedule refill');
+    }
+  };
+
+  const viewHistory = async () => {
+    if (!selected) return;
+    try {
+      setHistory(await api<{ type: string; at: string; message: string }[]>(`/storage/${selected._id}/history`));
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : 'Unable to load tank history');
+    }
+  };
+
+  const raiseEmergencyAlert = async () => {
+    if (!selected) return;
+    try {
+      await api(`/storage/${selected._id}/alert`, { method: 'POST', body: JSON.stringify({}) });
+      setActionMessage('Emergency alert created.');
+    } catch (error) {
+      setActionMessage(error instanceof Error ? error.message : 'Unable to create emergency alert');
+    }
+  };
 
   if (loading) {
     return (
@@ -433,13 +464,14 @@ export default function StorageManagement() {
 
               <div className="flex gap-3">
 
-                <Button size="sm">
+                <Button size="sm" onClick={scheduleRefill}>
                   Schedule Refill
                 </Button>
 
                 <Button
                   variant="secondary"
                   size="sm"
+                  onClick={viewHistory}
                 >
                   View History
                 </Button>
@@ -448,6 +480,7 @@ export default function StorageManagement() {
                   <Button
                     variant="danger"
                     size="sm"
+                    onClick={raiseEmergencyAlert}
                   >
                     <AlertTriangle size={13} />
                     Emergency Alert
@@ -455,6 +488,22 @@ export default function StorageManagement() {
                 )}
 
               </div>
+
+              {actionMessage && <p className="mt-3 text-sm text-emerald-600">{actionMessage}</p>}
+
+              {history.length > 0 && (
+                <div className="mt-4 border-t border-slate-100 pt-4">
+                  <p className="text-xs font-semibold text-slate-700 mb-2">Tank History</p>
+                  <div className="space-y-2">
+                    {history.map((event, index) => (
+                      <div key={`${event.type}-${event.at}-${index}`} className="flex items-center justify-between text-xs">
+                        <span className="text-slate-600">{event.message}</span>
+                        <span className="text-slate-400">{new Date(event.at).toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
             </Card>
 
