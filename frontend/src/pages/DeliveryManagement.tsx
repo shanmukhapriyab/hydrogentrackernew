@@ -9,18 +9,22 @@ export default function DeliveryManagement() {
   const [dateFilter, setDateFilter] = useState('today');
   const [schedule, setSchedule] = useState<any[]>([]);
   const [shipments, setShipments] = useState<any[]>([]);
+  const [deliveries, setDeliveries] = useState<any[]>([]);
   const [showNewDelivery, setShowNewDelivery] = useState(false);
+  const [showAssignDriver, setShowAssignDriver] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
   const [deliveryForm, setDeliveryForm] = useState({ shipmentId: '', driver: '', truck: '', scheduledAt: '' });
 
   useEffect(() => {
     const load = () => Promise.all([api<any[]>('/deliveries'), api<any[]>('/shipments')]).then(([deliveries, shipmentData]) => {
+      setDeliveries(deliveries);
       setShipments(shipmentData);
       const shipmentById = new Map(shipmentData.map(item => [item._id, item]));
       setSchedule(deliveries.map(delivery => {
         const shipment = shipmentById.get(delivery.shipmentId);
         return {
+          id: delivery._id,
           time: delivery.scheduledAt ? new Date(delivery.scheduledAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--',
           shipment: shipment?.shipmentId || delivery.shipmentId,
           driver: delivery.driver || shipment?.driver || 'Pending Assignment',
@@ -55,6 +59,26 @@ export default function DeliveryManagement() {
       setShowNewDelivery(false);
     } catch (error) {
       setFormError(error instanceof Error ? error.message : 'Unable to create delivery');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const assignDriver = async (event: React.FormEvent) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget as HTMLFormElement);
+    const deliveryId = String(form.get('deliveryId') || '');
+    if (!deliveryId) return;
+    setSaving(true);
+    setFormError('');
+    try {
+      await api(`/deliveries/${deliveryId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ driver: form.get('driver'), truck: form.get('truck'), status: 'transit' }),
+      });
+      setShowAssignDriver(false);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Unable to assign driver');
     } finally {
       setSaving(false);
     }
@@ -114,6 +138,33 @@ export default function DeliveryManagement() {
             <div className="sm:col-span-2 lg:col-span-4 flex gap-2">
               <Button type="submit" size="sm" disabled={saving}>{saving ? 'Saving...' : 'Save Delivery'}</Button>
               <Button type="button" variant="secondary" size="sm" onClick={() => setShowNewDelivery(false)}>Cancel</Button>
+            </div>
+          </form>
+        </Card>
+      )}
+
+      {showAssignDriver && (
+        <Card title="Assign Driver" subtitle="Assign a driver and vehicle to a scheduled delivery">
+          <form onSubmit={assignDriver} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <label className="text-xs text-slate-500">Delivery
+              <select name="deliveryId" required className="mt-1 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-800">
+                <option value="">Select delivery</option>
+                {deliveries.map(delivery => <option key={delivery._id} value={delivery._id}>{delivery._id.slice(-6)}</option>)}
+              </select>
+            </label>
+            <label className="text-xs text-slate-500">Driver
+              <select name="driver" required className="mt-1 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-800">
+                <option value="">Select driver</option>
+                {drivers.map(driver => <option key={driver.name} value={driver.name}>{driver.name}</option>)}
+              </select>
+            </label>
+            <label className="text-xs text-slate-500">Truck
+              <input name="truck" required className="mt-1 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-800" placeholder="TRK-000" />
+            </label>
+            {formError && <p className="sm:col-span-3 text-sm text-red-600">{formError}</p>}
+            <div className="sm:col-span-3 flex gap-2">
+              <Button type="submit" size="sm" disabled={saving}>{saving ? 'Saving...' : 'Assign Driver'}</Button>
+              <Button type="button" variant="secondary" size="sm" onClick={() => setShowAssignDriver(false)}>Cancel</Button>
             </div>
           </form>
         </Card>
@@ -222,7 +273,7 @@ export default function DeliveryManagement() {
               ))}
             </div>
             <div className="p-4 border-t border-slate-100">
-              <Button variant="secondary" size="sm" className="w-full justify-center">Assign Driver</Button>
+              <Button variant="secondary" size="sm" className="w-full justify-center" onClick={() => setShowAssignDriver(true)}>Assign Driver</Button>
             </div>
           </Card>
         </div>
