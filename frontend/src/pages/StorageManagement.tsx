@@ -36,6 +36,13 @@ export default function StorageManagement() {
   const [storages, setStorages] = useState<Storage[]>([]);
   const [selected, setSelected] = useState<Storage | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showAddTank, setShowAddTank] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [tankForm, setTankForm] = useState({
+    facilityName: '', tankId: '', capacityKg: '', currentLevelKg: '',
+    pressureBar: '', temperatureC: '', safetyThresholdPct: '20', lat: '', lng: '',
+  });
 
   useEffect(() => {
     const load = () => api<Storage[]>('/storage').then(data => {
@@ -72,6 +79,44 @@ export default function StorageManagement() {
       ? Math.round((totalCur / totalCap) * 100)
       : 0;
 
+  const updateTankField = (field: string, value: string) => {
+    setTankForm(current => ({ ...current, [field]: value }));
+  };
+
+  const createTank = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSaving(true);
+    setFormError('');
+    try {
+      await api('/storage', {
+        method: 'POST',
+        body: JSON.stringify({
+          facilityName: tankForm.facilityName,
+          tankId: tankForm.tankId,
+          capacityKg: Number(tankForm.capacityKg),
+          currentLevelKg: Number(tankForm.currentLevelKg),
+          pressureBar: Number(tankForm.pressureBar),
+          temperatureC: Number(tankForm.temperatureC),
+          safetyThresholdPct: Number(tankForm.safetyThresholdPct),
+          location: { lat: Number(tankForm.lat), lng: Number(tankForm.lng) },
+        }),
+      });
+      setShowAddTank(false);
+      setTankForm({ facilityName: '', tankId: '', capacityKg: '', currentLevelKg: '', pressureBar: '', temperatureC: '', safetyThresholdPct: '20', lat: '', lng: '' });
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Unable to create tank');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const addTankButton = (
+    <Button size="sm" onClick={() => setShowAddTank(true)}>
+      <Plus size={13} />
+      Add Tank
+    </Button>
+  );
+
   if (loading) {
     return (
       <div className="p-6 max-w-screen-xl fade-in">
@@ -94,10 +139,7 @@ export default function StorageManagement() {
           title="Storage Management"
           subtitle="Monitor and manage hydrogen storage facilities"
           actions={
-            <Button size="sm">
-              <Plus size={13} />
-              Add Tank
-            </Button>
+            addTankButton
           }
         />
 
@@ -117,12 +159,32 @@ export default function StorageManagement() {
         title="Storage Management"
         subtitle="Monitor and manage hydrogen storage facilities"
         actions={
-          <Button size="sm">
-            <Plus size={13} />
-            Add Tank
-          </Button>
+          addTankButton
         }
       />
+
+      {showAddTank && (
+        <Card title="Add Storage Tank" subtitle="Create a tank record in MongoDB">
+          <form onSubmit={createTank} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {[
+              ['facilityName', 'Facility name', 'text'], ['tankId', 'Tank ID', 'text'],
+              ['capacityKg', 'Capacity (kg)', 'number'], ['currentLevelKg', 'Current level (kg)', 'number'],
+              ['pressureBar', 'Pressure (bar)', 'number'], ['temperatureC', 'Temperature (C)', 'number'],
+              ['safetyThresholdPct', 'Safety threshold (%)', 'number'], ['lat', 'Latitude', 'number'], ['lng', 'Longitude', 'number'],
+            ].map(([field, label, type]) => (
+              <label key={field} className="text-xs text-slate-500">
+                {label}
+                <input required={field !== 'safetyThresholdPct'} type={type} value={tankForm[field as keyof typeof tankForm]} onChange={event => updateTankField(field, event.target.value)} className="mt-1 w-full px-3 py-2 text-sm border border-slate-200 rounded-lg text-slate-800" />
+              </label>
+            ))}
+            {formError && <p className="sm:col-span-2 lg:col-span-3 text-sm text-red-600">{formError}</p>}
+            <div className="sm:col-span-2 lg:col-span-3 flex gap-2">
+              <Button type="submit" size="sm" disabled={saving}>{saving ? 'Saving...' : 'Save Tank'}</Button>
+              <Button type="button" variant="secondary" size="sm" onClick={() => setShowAddTank(false)}>Cancel</Button>
+            </div>
+          </form>
+        </Card>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
 
