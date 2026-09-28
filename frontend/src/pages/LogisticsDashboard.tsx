@@ -118,10 +118,7 @@ export default function LogisticsDashboard({ onNavigate }: { onNavigate: (p: any
         title="Logistics Dashboard"
         subtitle="Real-time shipment tracking and fleet management"
         actions={
-          <>
-            <Button variant="secondary" size="sm">Filter</Button>
-            <Button size="sm" onClick={() => onNavigate('delivery')}><Package size={13} />Schedule Delivery</Button>
-          </>
+          <Button size="sm" onClick={() => onNavigate('delivery')}><Package size={13} />Schedule Delivery</Button>
         }
       />
 
