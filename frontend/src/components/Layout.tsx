@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { subscribeToResource } from '../lib/realtime';
+import { ThemeToggle } from './ui';
 
 type Page =
   | 'login' | 'producer-dashboard' | 'production' | 'storage'
@@ -19,6 +20,8 @@ interface LayoutProps {
   currentPage: Page;
   onNavigate: (page: Page) => void;
   userRole: UserRole;
+  isDark: boolean;
+  onToggleTheme: () => void;
   children: React.ReactNode;
 }
 
@@ -70,7 +73,7 @@ const ROLE_NAMES: Record<UserRole, string> = {
   customer: 'Thomas Berg',
 };
 
-export default function Layout({ currentPage, onNavigate, userRole, children }: LayoutProps) {
+export default function Layout({ currentPage, onNavigate, userRole, isDark, onToggleTheme, children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const navItems = NAV_ITEMS[userRole];
@@ -187,6 +190,7 @@ export default function Layout({ currentPage, onNavigate, userRole, children }: 
           </div>
 
           <div className="ml-auto flex items-center gap-2">
+            <ThemeToggle isDark={isDark} onToggle={onToggleTheme} />
             <button
               onClick={() => onNavigate('notifications')}
               className="relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
