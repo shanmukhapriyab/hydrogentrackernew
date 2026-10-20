@@ -36,7 +36,7 @@ export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any)
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Active Orders" value={myOrders.filter(order => !['delivered', 'cancelled'].includes(order.status)).length} icon={<ShoppingCart size={18} />} color="blue" />
         <StatCard label="In Transit" value={myShipments.filter(shipment => shipment.status === 'transit').length} icon={<Truck size={18} />} color="purple" />
-        <StatCard label="Delivered (Sep)" value={8} icon={<Package size={18} />} color="green" />
+        <StatCard label="Delivered (Sep)" value={8} icon={<Package size={18} />} color="cyan" />
         <StatCard label="Total Volume (YTD)" value="278.1" unit="t" change={12.4} changeLabel="vs 2025" icon={<TrendingUp size={18} />} color="amber" />
       </div>
 
@@ -48,8 +48,8 @@ export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any)
               <AreaChart data={consumption} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
                 <defs>
                   <linearGradient id="gradC1" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#0D477A" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#0D477A" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -57,7 +57,7 @@ export default function CustomerDashboard({ onNavigate }: { onNavigate: (p: any)
                 <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}t`} />
                 <Tooltip contentStyle={{ border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} />
                 <Area type="monotone" dataKey="ordered" stroke="#cbd5e1" strokeWidth={1.5} fill="none" name="Ordered (kg)" strokeDasharray="4 2" />
-                <Area type="monotone" dataKey="delivered" stroke="#2563eb" strokeWidth={2} fill="url(#gradC1)" name="Delivered (kg)" />
+                <Area type="monotone" dataKey="delivered" stroke="#0D477A" strokeWidth={2} fill="url(#gradC1)" name="Delivered (kg)" />
               </AreaChart>
             </ResponsiveContainer>
           </Card>

@@ -14,7 +14,7 @@ const SYSTEM_METRICS = [
   { label: 'DB Connections', value: '124/500', ok: true },
 ];
 
-const PIE_COLORS = ['#2563eb', '#10b981', '#94a3b8'];
+const PIE_COLORS = ['#0D477A', '#22d3ee', '#94a3b8'];
 
 export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) => void }) {
   const [users, setUsers] = useState<any[]>([]);
@@ -50,7 +50,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
 
       {/* KPI row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Total Revenue (Sep)" value="$3.74M" change={4.6} changeLabel="vs Aug" icon={<DollarSign size={18} />} color="green" />
+        <StatCard label="Total Revenue (Sep)" value="$3.74M" change={4.6} changeLabel="vs Aug" icon={<DollarSign size={18} />} color="cyan" />
         <StatCard label="Active Users" value={activeUsers} unit={`/${users.length}`} icon={<Users size={18} />} color="blue" />
         <StatCard label="Plants Online" value={summary.totals?.productionCount || 0} unit="live" icon={<Factory size={18} />} color="amber" />
         <StatCard label="Critical Alerts" value={criticalAlerts} icon={<AlertTriangle size={18} />} color="red" />
@@ -67,8 +67,8 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
                 <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1e6).toFixed(1)}M`} />
                 <Tooltip contentStyle={{ border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} formatter={(v: any) => [`$${(v/1e6).toFixed(2)}M`]} />
                 <Bar dataKey="cost" fill="#dbeafe" radius={[4,4,0,0]} name="Cost" />
-                <Bar dataKey="revenue" fill="#2563eb" radius={[4,4,0,0]} name="Revenue" />
-                <Line type="monotone" dataKey="revenue" stroke="#1d4ed8" strokeWidth={0} dot={false} />
+                <Bar dataKey="revenue" fill="#0D477A" radius={[4,4,0,0]} name="Revenue" />
+                <Line type="monotone" dataKey="revenue" stroke="#0B3157" strokeWidth={0} dot={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </Card>
@@ -141,7 +141,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
                   <span className="text-slate-500">{m.label}</span>
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-slate-800">{m.value}</span>
-                    <div className={`w-1.5 h-1.5 rounded-full ${m.ok ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                    <div className={`w-1.5 h-1.5 rounded-full ${m.ok ? 'bg-cyan-500' : 'bg-red-500'}`} />
                   </div>
                 </div>
               ))}
