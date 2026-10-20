@@ -1,5 +1,27 @@
 import React from 'react';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { Moon, Sun, TrendingUp, TrendingDown } from 'lucide-react';
+
+export function ThemeToggle({ isDark, onToggle }: { isDark: boolean; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      role="switch"
+      aria-checked={isDark}
+      aria-label={`${isDark ? 'Dark' : 'Light'} mode enabled. Switch to ${isDark ? 'light' : 'dark'} mode`}
+      title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
+      className={`theme-toggle relative w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+        isDark ? 'bg-blue-600' : 'bg-slate-200'
+      }`}
+    >
+      <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm flex items-center justify-center transition-transform ${
+        isDark ? 'translate-x-5' : 'translate-x-0.5'
+      }`}>
+        {isDark ? <Moon size={12} className="text-blue-600" /> : <Sun size={12} className="text-amber-500" />}
+      </span>
+    </button>
+  );
+}
 
 // Stat Card
 interface StatCardProps {
@@ -9,13 +31,13 @@ interface StatCardProps {
   change?: number;
   changeLabel?: string;
   icon?: React.ReactNode;
-  color?: 'blue' | 'green' | 'amber' | 'red' | 'purple';
+  color?: 'blue' | 'cyan' | 'amber' | 'red' | 'purple';
   onClick?: () => void;
 }
 
 const COLOR_MAP = {
   blue: { bg: 'bg-blue-50', text: 'text-blue-600', icon: 'bg-blue-100' },
-  green: { bg: 'bg-emerald-50', text: 'text-emerald-600', icon: 'bg-emerald-100' },
+  cyan: { bg: 'bg-cyan-50', text: 'text-cyan-600', icon: 'bg-cyan-100' },
   amber: { bg: 'bg-amber-50', text: 'text-amber-600', icon: 'bg-amber-100' },
   red: { bg: 'bg-red-50', text: 'text-red-600', icon: 'bg-red-100' },
   purple: { bg: 'bg-purple-50', text: 'text-purple-600', icon: 'bg-purple-100' },
@@ -40,9 +62,9 @@ export function StatCard({ label, value, unit, change, changeLabel, icon, color 
               {change !== undefined && (
                 <>
                   {change >= 0
-                    ? <TrendingUp size={13} className="text-emerald-500" />
+                    ? <TrendingUp size={13} className="text-cyan-500" />
                     : <TrendingDown size={13} className="text-red-500" />}
-                  <span className={`text-xs font-medium ${change >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                  <span className={`text-xs font-medium ${change >= 0 ? 'text-cyan-600' : 'text-red-600'}`}>
                     {change >= 0 ? '+' : ''}{change}%
                   </span>
                 </>
@@ -68,9 +90,9 @@ interface BadgeProps {
 }
 
 const STATUS_MAP: Record<string, { bg: string; text: string; dot?: string }> = {
-  active: { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
-  confirmed: { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
-  delivered: { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-500' },
+  active: { bg: 'bg-cyan-50', text: 'text-cyan-700', dot: 'bg-cyan-500' },
+  confirmed: { bg: 'bg-cyan-50', text: 'text-cyan-700', dot: 'bg-cyan-500' },
+  delivered: { bg: 'bg-cyan-50', text: 'text-cyan-700', dot: 'bg-cyan-500' },
   pending: { bg: 'bg-amber-50', text: 'text-amber-700', dot: 'bg-amber-400' },
   processing: { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500' },
   transit: { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500' },
@@ -170,7 +192,7 @@ export function ProgressBar({ value, max = 100, color = 'blue', showLabel = fals
   value: number; max?: number; color?: string; showLabel?: boolean; size?: 'sm' | 'md';
 }) {
   const pct = Math.round((value / max) * 100);
-  const colorClass = pct > 85 ? 'bg-emerald-500' : pct > 60 ? 'bg-blue-500' : pct > 30 ? 'bg-amber-500' : 'bg-red-500';
+  const colorClass = pct > 85 ? 'bg-cyan-500' : pct > 60 ? 'bg-blue-500' : pct > 30 ? 'bg-amber-500' : 'bg-red-500';
   return (
     <div className="flex items-center gap-2">
       <div className={`flex-1 bg-slate-100 rounded-full overflow-hidden ${size === 'sm' ? 'h-1.5' : 'h-2'}`}>
@@ -187,13 +209,13 @@ export function AlertIcon({ type }: { type: string }) {
     critical: 'bg-red-100 text-red-600',
     warning: 'bg-amber-100 text-amber-600',
     info: 'bg-blue-100 text-blue-600',
-    success: 'bg-emerald-100 text-emerald-600',
+    success: 'bg-cyan-100 text-cyan-600',
   };
   const dots: Record<string, string> = {
     critical: 'bg-red-500',
     warning: 'bg-amber-500',
     info: 'bg-blue-500',
-    success: 'bg-emerald-500',
+    success: 'bg-cyan-500',
   };
   return <span className={`w-2 h-2 rounded-full flex-shrink-0 mt-1 ${dots[type] ?? 'bg-slate-400'}`} />;
 }
