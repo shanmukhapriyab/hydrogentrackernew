@@ -217,7 +217,7 @@ export default function DeliveryManagement() {
                       <div key={i} className="flex items-start gap-4 py-2">
                         <span className="text-xs font-mono font-bold text-slate-500 w-12 text-right flex-shrink-0 pt-0.5">{row.time}</span>
                         <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-0.5 z-10 border-2 border-white ${
-                          row.status === 'delivered' ? 'bg-emerald-500' :
+                          row.status === 'delivered' ? 'bg-cyan-500' :
                           row.status === 'transit' ? 'bg-blue-500' :
                           row.status === 'delayed' ? 'bg-red-500' : 'bg-amber-400'
                         }`} />
@@ -250,7 +250,7 @@ export default function DeliveryManagement() {
                 <div key={driver.name} className="px-4 py-3 hover:bg-slate-50 transition-colors">
                   <div className="flex items-start gap-3">
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-1.5 ${
-                      driver.status === 'active' ? 'bg-emerald-500' :
+                      driver.status === 'active' ? 'bg-cyan-500' :
                       driver.status === 'delayed' ? 'bg-red-500' : 'bg-slate-300'
                     }`} />
                     <div className="min-w-0 flex-1">
@@ -261,7 +261,7 @@ export default function DeliveryManagement() {
                       <p className="text-xs text-slate-400 mt-0.5 truncate">{driver.location}</p>
                       <div className="flex items-center gap-1 mt-1">
                         <span className={`text-xs font-medium ${
-                          driver.status === 'active' ? 'text-emerald-600' :
+                          driver.status === 'active' ? 'text-cyan-600' :
                           driver.status === 'delayed' ? 'text-red-600' : 'text-slate-500'
                         }`}>
                           {driver.status === 'active' ? 'En route' : driver.status === 'delayed' ? 'Delayed' : 'Available'}

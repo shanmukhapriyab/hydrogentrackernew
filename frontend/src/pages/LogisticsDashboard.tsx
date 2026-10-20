@@ -64,7 +64,7 @@ const CITY_COORDINATES: Record<string, Point> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  transit: '#16a34a', delivered: '#2563eb', delayed: '#f59e0b', pending: '#64748b', critical: '#dc2626',
+  transit: '#22d3ee', delivered: '#0D477A', delayed: '#f59e0b', pending: '#64748b', critical: '#dc2626',
 };
 
 export function LogisticsMap({ shipments, facilities, storages, onShipmentClick }: { shipments: Shipment[]; facilities: Facility[]; storages: Storage[]; onShipmentClick: (id: string) => void }) {
@@ -151,7 +151,7 @@ export function LogisticsMap({ shipments, facilities, storages, onShipmentClick 
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {coordinates && (
-          <Marker position={[coordinates.latitude, coordinates.longitude]} icon={mapIcon('●', '#2563eb')}>
+          <Marker position={[coordinates.latitude, coordinates.longitude]} icon={mapIcon('●', '#0D477A')}>
             <Popup><strong>Your current location</strong><div>Accuracy: within {Math.round(coordinates.accuracy)} m</div></Popup>
           </Marker>
         )}
@@ -161,7 +161,7 @@ export function LogisticsMap({ shipments, facilities, storages, onShipmentClick 
         })}
         {layers.plants && facilities.map(facility => {
           const position = facility.locationCoords ?? pointFor(facility.location || '');
-          return position ? <Marker key={facility._id} position={position} icon={mapIcon('⚡', '#16a34a')}><Popup><strong>{facility.plantName || facility.plantId || 'Production plant'}</strong><div>Production facility · {facility.location || ''}</div></Popup></Marker> : null;
+          return position ? <Marker key={facility._id} position={position} icon={mapIcon('⚡', '#22d3ee')}><Popup><strong>{facility.plantName || facility.plantId || 'Production plant'}</strong><div>Production facility · {facility.location || ''}</div></Popup></Marker> : null;
         })}
         {layers.storage && storages.map(storage => <Marker key={storage._id} position={[storage.location.lat, storage.location.lng]} icon={mapIcon('▣', '#7c3aed')}><Popup><strong>{storage.facilityName}</strong><div>Tank {storage.tankId} · Status: {storage.status} · Fill: {storage.fillPercent ?? '—'}%</div></Popup></Marker>)}
         {layers.customers && visibleShipments.map(shipment => {
@@ -186,7 +186,7 @@ export function LogisticsMap({ shipments, facilities, storages, onShipmentClick 
         </div>
       </div>
       <div className="absolute bottom-3 left-3 z-[1000] flex flex-wrap items-center gap-2">
-        <div className="rounded-lg border border-slate-200 bg-white/95 px-3 py-2 text-[11px] shadow-sm"><div className="flex flex-wrap gap-x-3 gap-y-1"><span><i className="legend-dot bg-green-600" />Active</span><span><i className="legend-dot bg-blue-600" />Completed</span><span><i className="legend-dot bg-amber-400" />Delayed</span><span><i className="legend-dot bg-red-600" />Critical</span></div></div>
+        <div className="rounded-lg border border-slate-200 bg-white/95 px-3 py-2 text-[11px] shadow-sm"><div className="flex flex-wrap gap-x-3 gap-y-1"><span><i className="legend-dot bg-cyan-500" />Active</span><span><i className="legend-dot bg-blue-600" />Completed</span><span><i className="legend-dot bg-amber-400" />Delayed</span><span><i className="legend-dot bg-red-600" />Critical</span></div></div>
         <button className="map-action" onClick={() => allPoints.length && map?.fitBounds(L.latLngBounds(allPoints), { padding: [30, 30] })}><LocateFixed size={13} /> Fit all</button>
         <button className="map-action" onClick={locateUser} disabled={locationLoading}><LocateFixed size={13} /> {locationLoading ? 'Locating…' : 'Use my location'}</button>
         <button className={`map-action ${activeOnly ? 'bg-blue-50 text-blue-700' : ''}`} onClick={() => setActiveOnly(current => !current)}><Truck size={13} /> Active only</button>
@@ -272,7 +272,7 @@ export default function LogisticsDashboard({ onNavigate }: { onNavigate: (p: any
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard label="In Transit" value={inTransit} icon={<Truck size={18} />} color="blue" />
         <StatCard label="Delayed" value={delayed} icon={<AlertTriangle size={18} />} color="red" />
-        <StatCard label="Delivered Today" value={delivered} icon={<Package size={18} />} color="green" />
+        <StatCard label="Delivered Today" value={delivered} icon={<Package size={18} />} color="cyan" />
         <StatCard label="Pending" value={pending} icon={<Clock size={18} />} color="amber" />
         <StatCard label="Total Volume" value={(totalKg / 1000).toFixed(1)} unit="t" icon={<MapPin size={18} />} color="purple" />
       </div>
