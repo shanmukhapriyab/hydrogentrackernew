@@ -47,9 +47,9 @@ export default function Notifications() {
       border: 'border-l-blue-400',
     },
     success: {
-      icon: <CheckCircle size={14} className="text-emerald-500" />,
-      bg: 'bg-emerald-50',
-      border: 'border-l-emerald-400',
+      icon: <CheckCircle size={14} className="text-cyan-500" />,
+      bg: 'bg-cyan-50',
+      border: 'border-l-cyan-400',
     },
   };
 

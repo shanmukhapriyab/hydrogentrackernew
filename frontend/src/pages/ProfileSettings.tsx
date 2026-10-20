@@ -114,8 +114,8 @@ export default function ProfileSettings() {
                 <p className="text-xs text-slate-500 mt-0.5">Use an authenticator app to generate one-time codes</p>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full" />
-                <span className="text-xs font-medium text-emerald-600">Enabled</span>
+                <div className="w-2 h-2 bg-cyan-500 rounded-full" />
+                <span className="text-xs font-medium text-cyan-600">Enabled</span>
               </div>
             </div>
             <div className="space-y-2">
@@ -140,7 +140,7 @@ export default function ProfileSettings() {
                     <p className="text-xs text-slate-400">{session.location} · {session.time}</p>
                   </div>
                   {session.current ? (
-                    <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full font-medium">Current</span>
+                    <span className="text-xs bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-full font-medium">Current</span>
                   ) : (
                     <button className="text-xs text-red-500 hover:underline font-medium">Revoke</button>
                   )}
