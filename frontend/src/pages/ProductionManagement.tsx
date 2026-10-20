@@ -61,7 +61,7 @@ export default function ProductionManagement() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Total Plants" value={plants.length} icon={<Settings size={18} />} color="blue" />
-        <StatCard label="Active" value={plants.filter(p => p.status === 'active').length} icon={<Settings size={18} />} color="green" />
+        <StatCard label="Active" value={plants.filter(p => p.status === 'active').length} icon={<Settings size={18} />} color="cyan" />
         <StatCard label="In Maintenance" value={plants.filter(p => p.status === 'maintenance').length} icon={<Settings size={18} />} color="amber" />
         <StatCard label="Total Daily Output" value={plants.reduce((sum, plant) => sum + plant.output, 0).toFixed(1)} unit="t/day" icon={<Settings size={18} />} color="purple" />
       </div>
@@ -181,7 +181,7 @@ export default function ProductionManagement() {
                 <XAxis dataKey="h" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                 <YAxis domain={[80, 115]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} />
-                <Line type="monotone" dataKey="output" stroke="#2563eb" strokeWidth={2} dot={false} name="Output (t/d)" />
+                <Line type="monotone" dataKey="output" stroke="#0D477A" strokeWidth={2} dot={false} name="Output (t/d)" />
               </LineChart>
             </ResponsiveContainer>
           </Card>
@@ -196,9 +196,9 @@ export default function ProductionManagement() {
                 <p className="text-xs text-slate-500 mb-1">{m.label}</p>
                 <p className="text-xl font-bold text-slate-900">{m.value}</p>
                 <div className="mt-2 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${Math.round((m.current / m.max) * 100)}%` }} />
+                  <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${Math.round((m.current / m.max) * 100)}%` }} />
                 </div>
-                <p className="text-xs text-emerald-600 mt-1 font-medium">Normal</p>
+                <p className="text-xs text-cyan-600 mt-1 font-medium">Normal</p>
               </div>
             ))}
           </div>

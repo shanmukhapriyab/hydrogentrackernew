@@ -128,7 +128,7 @@ export default function ProducerDashboard({
           change={0}
           changeLabel="current"
           icon={<Factory size={18} />}
-          color="green"
+          color="cyan"
         />
 
         <StatCard
@@ -177,12 +177,12 @@ export default function ProducerDashboard({
                 >
                   <stop
                     offset="5%"
-                    stopColor="#2563eb"
+                    stopColor="#0D477A"
                     stopOpacity={0.1}
                   />
                   <stop
                     offset="95%"
-                    stopColor="#2563eb"
+                    stopColor="#0D477A"
                     stopOpacity={0}
                   />
                 </linearGradient>
@@ -217,7 +217,7 @@ export default function ProducerDashboard({
               <Area
                 type="monotone"
                 dataKey="actual"
-                stroke="#2563eb"
+                stroke="#0D477A"
                 strokeWidth={2}
                 fill="url(#grad1)"
                 name="Actual"
@@ -270,7 +270,7 @@ export default function ProducerDashboard({
 
               <Bar
                 dataKey="cost"
-                fill="#2563eb"
+                fill="#0D477A"
                 radius={[4, 4, 0, 0]}
                 name="Cost"
               />
@@ -380,7 +380,7 @@ export default function ProducerDashboard({
                         : alert.type === 'warning'
                         ? 'bg-amber-400'
                         : alert.type === 'success'
-                        ? 'bg-emerald-500'
+                        ? 'bg-cyan-500'
                         : 'bg-blue-400'
                     }`}
                   />

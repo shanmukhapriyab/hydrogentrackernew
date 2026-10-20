@@ -232,7 +232,7 @@ export default function StorageManagement() {
           value={(totalCur / 1000).toFixed(1)}
           unit="t"
           icon={<Database size={18} />}
-          color="green"
+          color="cyan"
         />
 
         <StatCard
@@ -268,7 +268,7 @@ export default function StorageManagement() {
               ? 'bg-red-500'
               : pct < 50
               ? 'bg-amber-400'
-              : 'bg-emerald-500';
+              : 'bg-cyan-500';
 
           return (
             <button
@@ -487,7 +487,7 @@ export default function StorageManagement() {
 
               </div>
 
-              {actionMessage && <p className="mt-3 text-sm text-emerald-600">{actionMessage}</p>}
+              {actionMessage && <p className="mt-3 text-sm text-cyan-600">{actionMessage}</p>}
 
               {history.length > 0 && (
                 <div className="mt-4 border-t border-slate-100 pt-4">
