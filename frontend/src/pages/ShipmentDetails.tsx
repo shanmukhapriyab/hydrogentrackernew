@@ -105,16 +105,16 @@ export default function ShipmentDetails() {
                 <svg viewBox="0 0 400 220" className="w-full h-full">
                   {/* Road */}
                   <path d="M 60 160 Q 180 80 340 60" stroke="#cbd5e1" strokeWidth="3" fill="none" strokeDasharray="6 3" />
-                  <path d="M 60 160 Q 180 80 340 60" stroke="#2563eb" strokeWidth="2" fill="none" strokeDasharray="6 3" opacity="0.5" />
+                  <path d="M 60 160 Q 180 80 340 60" stroke="#0D477A" strokeWidth="2" fill="none" strokeDasharray="6 3" opacity="0.5" />
 
                   {/* Origin */}
-                  <circle cx={60} cy={160} r={10} fill="#16a34a" />
+                  <circle cx={60} cy={160} r={10} fill="#22d3ee" />
                   <circle cx={60} cy={160} r={5} fill="white" />
                   <text x={60} y={180} textAnchor="middle" fontSize="9" fill="#374151" fontFamily="Inter" fontWeight="600">Origin</text>
                   <text x={60} y={192} textAnchor="middle" fontSize="8" fill="#94a3b8" fontFamily="Inter">{shipment.origin.split(',')[0]}</text>
 
                   {/* Destination */}
-                  <circle cx={340} cy={60} r={10} fill="#2563eb" />
+                  <circle cx={340} cy={60} r={10} fill="#0D477A" />
                   <circle cx={340} cy={60} r={5} fill="white" />
                   <text x={340} y={80} textAnchor="middle" fontSize="9" fill="#374151" fontFamily="Inter" fontWeight="600">Destination</text>
                   <text x={340} y={92} textAnchor="middle" fontSize="8" fill="#94a3b8" fontFamily="Inter">{shipment.destination.split(' ').slice(0,2).join(' ')}</text>
@@ -122,14 +122,14 @@ export default function ShipmentDetails() {
                   {/* Truck position */}
                   {shipment.progress > 0 && shipment.progress < 100 && (
                     <g>
-                      <circle cx={180} cy={105} r={14} fill="#2563eb" fillOpacity="0.1" />
-                      <circle cx={180} cy={105} r={8} fill="#2563eb" />
+                      <circle cx={180} cy={105} r={14} fill="#0D477A" fillOpacity="0.1" />
+                      <circle cx={180} cy={105} r={8} fill="#0D477A" />
                       <text x={180} y={109} textAnchor="middle" fontSize="9" fill="white" fontFamily="Inter" fontWeight="bold">🚛</text>
                     </g>
                   )}
 
                   {/* Progress label */}
-                  <text x={200} y={30} textAnchor="middle" fontSize="11" fill="#2563eb" fontFamily="Inter" fontWeight="700">{shipment.progress}% Complete</text>
+                  <text x={200} y={30} textAnchor="middle" fontSize="11" fill="#0D477A" fontFamily="Inter" fontWeight="700">{shipment.progress}% Complete</text>
                 </svg>
               </div>
             </Card>
@@ -141,14 +141,14 @@ export default function ShipmentDetails() {
                   <div key={i} className="flex gap-3">
                     <div className="flex flex-col items-center">
                       {step.done ? (
-                        <CheckCircle size={16} className="text-emerald-500 flex-shrink-0" />
+                        <CheckCircle size={16} className="text-cyan-500 flex-shrink-0" />
                       ) : step.active ? (
                         <div className="w-4 h-4 rounded-full border-2 border-blue-500 bg-blue-100 flex-shrink-0 animate-pulse" />
                       ) : (
                         <Circle size={16} className="text-slate-300 flex-shrink-0" />
                       )}
                       {i < TIMELINE.length - 1 && (
-                        <div className={`w-0.5 flex-1 mt-1 ${step.done ? 'bg-emerald-200' : 'bg-slate-100'}`} />
+                        <div className={`w-0.5 flex-1 mt-1 ${step.done ? 'bg-cyan-200' : 'bg-slate-100'}`} />
                       )}
                     </div>
                     <div className="pb-3">

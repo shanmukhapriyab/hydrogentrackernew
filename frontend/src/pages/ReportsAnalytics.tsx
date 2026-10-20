@@ -95,7 +95,7 @@ export default function ReportsAnalytics() {
           <div key={m.label} className="bg-white rounded-xl border border-slate-200 p-4">
             <p className="text-xs text-slate-400 mb-1.5 uppercase tracking-wide">{m.label}</p>
             <p className="text-2xl font-bold text-slate-900">{m.value}<span className="text-base text-slate-400 ml-1">{m.unit}</span></p>
-            <p className="text-xs text-emerald-600 font-medium mt-1">{m.change} vs last year</p>
+            <p className="text-xs text-cyan-600 font-medium mt-1">{m.change} vs last year</p>
           </div>
         ))}
       </div>
@@ -107,12 +107,12 @@ export default function ReportsAnalytics() {
               <AreaChart data={monthly} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
               <defs>
                 <linearGradient id="gP" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#0D477A" stopOpacity={0.15} />
+                  <stop offset="95%" stopColor="#0D477A" stopOpacity={0} />
                 </linearGradient>
                 <linearGradient id="gD" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.15} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                  <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.15} />
+                  <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
@@ -120,8 +120,8 @@ export default function ReportsAnalytics() {
               <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Area type="monotone" dataKey="production" stroke="#2563eb" strokeWidth={2} fill="url(#gP)" name="Production (t)" />
-              <Area type="monotone" dataKey="deliveries" stroke="#10b981" strokeWidth={2} fill="url(#gD)" name="Deliveries (t)" />
+              <Area type="monotone" dataKey="production" stroke="#0D477A" strokeWidth={2} fill="url(#gP)" name="Production (t)" />
+              <Area type="monotone" dataKey="deliveries" stroke="#22d3ee" strokeWidth={2} fill="url(#gD)" name="Deliveries (t)" />
             </AreaChart>
           </ResponsiveContainer>
         </Card>
@@ -133,7 +133,7 @@ export default function ReportsAnalytics() {
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1e6).toFixed(1)}M`} />
               <Tooltip contentStyle={{ border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} formatter={(v: any) => [`$${(v/1e6).toFixed(2)}M`]} />
-              <Bar dataKey="revenue" fill="#2563eb" radius={[4,4,0,0]} name="Revenue" />
+              <Bar dataKey="revenue" fill="#0D477A" radius={[4,4,0,0]} name="Revenue" />
             </BarChart>
           </ResponsiveContainer>
         </Card>
@@ -146,8 +146,8 @@ export default function ReportsAnalytics() {
               <YAxis domain={[78, 86]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
               <Tooltip contentStyle={{ border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Line type="monotone" dataKey="pem" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} name="PEM (%)" />
-              <Line type="monotone" dataKey="alkaline" stroke="#10b981" strokeWidth={2} dot={{ r: 3 }} name="Alkaline (%)" />
+              <Line type="monotone" dataKey="pem" stroke="#0D477A" strokeWidth={2} dot={{ r: 3 }} name="PEM (%)" />
+              <Line type="monotone" dataKey="alkaline" stroke="#22d3ee" strokeWidth={2} dot={{ r: 3 }} name="Alkaline (%)" />
             </LineChart>
           </ResponsiveContainer>
         </Card>
@@ -159,7 +159,7 @@ export default function ReportsAnalytics() {
                 <PieChart>
                   <Pie data={regionData} cx="50%" cy="50%" outerRadius={70} dataKey="volume" paddingAngle={2}>
                     {regionData.map((_: any, i: number) => (
-                      <Cell key={i} fill={['#2563eb','#3b82f6','#93c5fd','#dbeafe','#eff6ff'][i]} />
+                      <Cell key={i} fill={['#0D477A','#0D477A','#93c5fd','#dbeafe','#eff6ff'][i]} />
                     ))}
                   </Pie>
                   <Tooltip contentStyle={{ border: '1px solid #e2e8f0', borderRadius: 8, fontSize: 12 }} formatter={(v: any) => [`${v}%`]} />
@@ -169,7 +169,7 @@ export default function ReportsAnalytics() {
             <div className="space-y-2 flex-1">
               {regionData.map((d: any, i: number) => (
                 <div key={d.region} className="flex items-center gap-2 text-xs">
-                  <div className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: ['#2563eb','#3b82f6','#93c5fd','#dbeafe','#eff6ff'][i] }} />
+                  <div className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ background: ['#0D477A','#0D477A','#93c5fd','#dbeafe','#eff6ff'][i] }} />
                   <span className="text-slate-600 flex-1">{d.region}</span>
                   <span className="font-bold text-slate-800">{d.volume}%</span>
                 </div>
@@ -185,9 +185,9 @@ export default function ReportsAnalytics() {
           {REPORTS.map(report => (
             <div key={report.name} className="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 transition-colors">
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                report.type === 'PDF' ? 'bg-red-100' : 'bg-emerald-100'
+                report.type === 'PDF' ? 'bg-red-100' : 'bg-cyan-100'
               }`}>
-                <FileText size={14} className={report.type === 'PDF' ? 'text-red-600' : 'text-emerald-600'} />
+                <FileText size={14} className={report.type === 'PDF' ? 'text-red-600' : 'text-cyan-600'} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-slate-800 truncate">{report.name}</p>
