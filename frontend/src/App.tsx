@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Login from './pages/Login';
 import Layout from './components/Layout';
@@ -52,6 +52,12 @@ const DEFAULT_PAGE: Record<UserRole, Page> = {
 export default function App() {
   const [page, setPage] = useState<Page>('login');
   const [role, setRole] = useState<UserRole>('admin');
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark');
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
 
   const handleLogin = (selectedRole: UserRole) => {
     setRole(selectedRole);
@@ -68,7 +74,7 @@ export default function App() {
   };
 
   if (page === 'login') {
-    return <Login onLogin={handleLogin} />;
+    return <Login onLogin={handleLogin} isDark={isDark} onToggleTheme={() => setIsDark(value => !value)} />;
   }
 
   const renderPage = () => {
@@ -155,6 +161,8 @@ export default function App() {
       currentPage={page}
       onNavigate={handleNavigate}
       userRole={role}
+      isDark={isDark}
+      onToggleTheme={() => setIsDark(value => !value)}
     >
       {renderPage()}
     </Layout>
