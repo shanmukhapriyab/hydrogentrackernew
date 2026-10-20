@@ -2,11 +2,14 @@ import { useState } from 'react';
 
 import { Zap, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { api } from '../lib/api';
+import { ThemeToggle } from '../components/ui';
 
 type UserRole = 'admin' | 'producer' | 'logistics' | 'customer';
 
 interface LoginProps {
   onLogin: (role: UserRole) => void;
+  isDark: boolean;
+  onToggleTheme: () => void;
 }
 
 const DEMO_ACCOUNTS: {
@@ -41,7 +44,7 @@ const DEMO_ACCOUNTS: {
   }
 ];
 
-export default function Login({ onLogin }: LoginProps) {
+export default function Login({ onLogin, isDark, onToggleTheme }: LoginProps) {
   const [email, setEmail] = useState('admin@hydrogen.com');
   const [password, setPassword] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
@@ -82,8 +85,11 @@ export default function Login({ onLogin }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-slate-100 flex">
-      <div className="hidden lg:flex flex-col w-[480px] bg-blue-700 text-white p-12 relative overflow-hidden flex-shrink-0">
+    <div className="login-page relative min-h-screen bg-gradient-to-br from-slate-100 via-cyan-50/40 to-slate-100 flex">
+      <div className="absolute right-5 top-5 z-10">
+        <ThemeToggle isDark={isDark} onToggle={onToggleTheme} />
+      </div>
+      <div className="login-brand-panel hidden lg:flex flex-col w-[480px] bg-gradient-to-br from-blue-700 via-cyan-700 to-cyan-900 text-white p-12 relative overflow-hidden flex-shrink-0">
         <div className="absolute inset-0 opacity-10">
           {[...Array(6)].map((_, i) => (
             <div
@@ -111,20 +117,25 @@ export default function Login({ onLogin }: LoginProps) {
                 HydrogenTrack
               </div>
 
-              <div className="text-blue-200 text-xs">
+              <div className="text-cyan-100 text-xs">
                 Supply Chain Platform
               </div>
             </div>
           </div>
 
           <div className="flex-1">
-            <h2 className="text-3xl font-bold leading-tight mb-4">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/40 bg-white/10 px-3 py-1 text-[11px] font-medium text-cyan-100 mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-300" />
+              Live operations visibility
+            </div>
+
+            <h2 className="text-3xl font-bold leading-tight mb-4 tracking-tight">
               Hydrogen Supply Chain,
               <br />
               Fully Visible.
             </h2>
 
-            <p className="text-blue-200 text-sm leading-relaxed mb-10">
+            <p className="text-cyan-100 text-sm leading-relaxed mb-10">
               Real-time production monitoring, intelligent logistics routing, and end-to-end traceability for green hydrogen operations.
             </p>
 
@@ -145,11 +156,11 @@ export default function Login({ onLogin }: LoginProps) {
               ].map(item => (
                 <div
                   key={item.label}
-                  className="flex items-center gap-3"
+                  className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-3"
                 >
-                  <div className="w-1.5 h-1.5 bg-blue-300 rounded-full" />
+                  <div className="w-1.5 h-1.5 bg-cyan-300 rounded-full" />
 
-                  <span className="text-blue-100 text-sm">
+                  <span className="text-cyan-50 text-sm">
                     {item.label}
                   </span>
 
@@ -161,8 +172,8 @@ export default function Login({ onLogin }: LoginProps) {
             </div>
           </div>
 
-          <div className="mt-auto pt-8 border-t border-blue-600">
-            <p className="text-blue-300 text-xs">
+          <div className="mt-auto pt-8 border-t border-cyan-500/60">
+            <p className="text-cyan-200 text-xs">
               ISO 27001 Certified · SOC 2 Type II · GDPR Compliant
             </p>
           </div>
@@ -171,9 +182,9 @@ export default function Login({ onLogin }: LoginProps) {
 
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
-          <div className="mb-8">
+          <div className="mb-7">
             <div className="flex items-center gap-2 mb-6 lg:hidden">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-cyan-600 rounded-lg flex items-center justify-center">
                 <Zap size={16} className="text-white" />
               </div>
 
@@ -182,7 +193,11 @@ export default function Login({ onLogin }: LoginProps) {
               </span>
             </div>
 
-            <h1 className="text-2xl font-bold text-slate-900 mb-1">
+            <div className="inline-flex items-center rounded-full bg-cyan-50 px-2.5 py-1 text-[11px] font-semibold text-cyan-700 mb-3">
+              Secure workspace access
+            </div>
+
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">
               Welcome back
             </h1>
 
@@ -191,7 +206,7 @@ export default function Login({ onLogin }: LoginProps) {
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+          <div className="login-card bg-white rounded-2xl border border-slate-200/80 shadow-[0_18px_45px_-24px_rgba(15,23,42,0.35)] p-6 space-y-4">
             <div>
               <label className="text-sm font-medium text-slate-700 block mb-1.5">
                 Email address
@@ -201,7 +216,7 @@ export default function Login({ onLogin }: LoginProps) {
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-slate-900"
+                className="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 text-slate-900"
               />
             </div>
 
@@ -211,7 +226,7 @@ export default function Login({ onLogin }: LoginProps) {
                   Password
                 </label>
 
-                <button className="text-xs text-blue-600 hover:underline">
+                <button className="text-xs text-cyan-700 hover:underline">
                   Forgot password?
                 </button>
               </div>
@@ -221,7 +236,7 @@ export default function Login({ onLogin }: LoginProps) {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  className="w-full px-3 py-2.5 pr-10 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-slate-900"
+                  className="w-full px-3 py-2.5 pr-10 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 text-slate-900"
                 />
 
                 <button
@@ -242,7 +257,7 @@ export default function Login({ onLogin }: LoginProps) {
               <input
                 type="checkbox"
                 id="remember"
-                className="rounded border-slate-300 text-blue-600"
+                className="rounded border-slate-300 text-cyan-600"
                 defaultChecked
               />
 
@@ -263,7 +278,7 @@ export default function Login({ onLogin }: LoginProps) {
             <button
               onClick={handleLogin}
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+              className="w-full bg-cyan-600 hover:bg-cyan-700 hover:shadow-lg hover:shadow-cyan-600/20 text-white font-medium py-2.5 rounded-lg text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-70"
             >
               {loading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -291,10 +306,10 @@ export default function Login({ onLogin }: LoginProps) {
                     setPassword('admin123');
                     setError('');
                   }}
-                  className={`text-left p-2.5 rounded-lg border text-xs transition-all ${
+                  className={`text-left p-3 rounded-xl border text-xs transition-all ${
                     selectedDemo === acc.role
-                      ? 'border-blue-400 bg-blue-50 text-blue-700'
-                      : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                      ? 'border-cyan-400 bg-cyan-50 text-cyan-700 shadow-sm'
+                      : 'border-slate-200 bg-white text-slate-600 hover:border-cyan-200 hover:bg-cyan-50/40'
                   }`}
                 >
                   <div className="font-medium">
