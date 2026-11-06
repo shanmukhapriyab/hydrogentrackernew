@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
-  LayoutDashboard, Factory, Database, Truck, Package, Users,
-  BarChart3, Settings, Bell, LogOut, ChevronRight, Menu, X,
-  Zap, ShoppingCart, MapPin, ChevronDown
+  LayoutDashboard, Factory, Database, Truck, Package,
+  BarChart3, Settings, Bell, LogOut, ChevronRight, Zap, MapPin
 } from 'lucide-react';
 import { api } from '../lib/api';
 import { subscribeToResource } from '../lib/realtime';
@@ -74,7 +73,6 @@ const ROLE_NAMES: Record<UserRole, string> = {
 };
 
 export default function Layout({ currentPage, onNavigate, userRole, isDark, onToggleTheme, children }: LayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const navItems = NAV_ITEMS[userRole];
 
@@ -85,134 +83,87 @@ export default function Layout({ currentPage, onNavigate, userRole, isDark, onTo
   }, []);
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-20 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside className={`
-        fixed lg:static inset-y-0 left-0 z-30
-        w-64 bg-white border-r border-slate-200 flex flex-col
-        transition-transform duration-200
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-      `}>
-        {/* Logo */}
-        <div className="h-16 flex items-center px-5 border-b border-slate-100 gap-3 flex-shrink-0">
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+    <div className="app-shell flex h-screen w-full min-w-0 bg-slate-50">
+      <aside className="app-sidebar flex w-60 shrink-0 flex-col border-r border-slate-200 bg-white">
+        <div className="flex h-16 items-center gap-3 border-b border-slate-200 px-5">
+          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#0b3157]">
             <Zap size={16} className="text-white" />
           </div>
           <div>
-            <div className="font-semibold text-slate-900 text-sm leading-none">HydrogenTrack</div>
-            <div className="text-xs text-slate-400 mt-0.5">Supply Chain Platform</div>
+            <div className="text-sm font-semibold leading-none tracking-tight text-slate-900">HydrogenTrack</div>
+            <div className="mt-1 text-[10px] uppercase tracking-wider text-slate-400">Operations platform</div>
           </div>
-          <button className="ml-auto lg:hidden text-slate-400" onClick={() => setSidebarOpen(false)}>
-            <X size={18} />
-          </button>
         </div>
-
-        {/* Role switcher */}
-        <div className="px-4 py-3 border-b border-slate-100 flex-shrink-0">
-          <div className="bg-slate-50 rounded-lg p-2.5 flex items-center gap-2.5">
-            <div className="w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">
+        <div className="border-b border-slate-100 px-4 py-4">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Workspace</p>
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#e6f2f1] text-xs font-semibold text-[#0b625e]">
               {ROLE_NAMES[userRole].split(' ').map(n => n[0]).join('')}
             </div>
             <div className="min-w-0">
-              <div className="text-xs font-medium text-slate-700 truncate">{ROLE_NAMES[userRole]}</div>
-              <div className="text-xs text-slate-400">{ROLE_LABELS[userRole]}</div>
+              <div className="truncate text-xs font-medium text-slate-800">{ROLE_NAMES[userRole]}</div>
+              <div className="truncate text-[11px] text-slate-500">{ROLE_LABELS[userRole]}</div>
             </div>
           </div>
         </div>
-
-        {/* Nav */}
-        <nav className="flex-1 overflow-y-auto sidebar-scroll px-3 py-3 space-y-0.5">
+        <nav className="sidebar-scroll flex-1 space-y-0.5 overflow-y-auto px-3 py-4" aria-label="Primary navigation">
+          <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Operations</p>
           {navItems.map(item => {
             const Icon = item.icon;
             const active = currentPage === item.page;
             return (
               <button
                 key={item.page}
-                onClick={() => { onNavigate(item.page); setSidebarOpen(false); }}
-                className={`
-                  w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all
-                  ${active
-                    ? 'bg-blue-50 text-blue-700 font-medium'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}
-                `}
+                onClick={() => onNavigate(item.page)}
+                className={`flex w-full items-center gap-3 border-l-2 px-3 py-2 text-left text-xs transition-colors ${
+                  active
+                    ? 'border-[#0b625e] bg-[#eef7f6] font-semibold text-[#0b625e]'
+                    : 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
               >
-                <Icon size={16} className={active ? 'text-blue-600' : 'text-slate-400'} />
-                <span className="flex-1 text-left">{item.label}</span>
+                <Icon size={16} className={active ? 'text-[#0b625e]' : 'text-slate-400'} />
+                <span className="min-w-0 flex-1 truncate">{item.label}</span>
                 {item.page === 'notifications' && unreadCount > 0 && (
-                  <span className="bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-medium">
-                    {unreadCount}
-                  </span>
+                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">{unreadCount}</span>
                 )}
-                {active && <ChevronRight size={14} className="text-blue-400" />}
               </button>
             );
           })}
         </nav>
-
-        <div className="px-3 py-3 border-t border-slate-100 flex-shrink-0">
+        <div className="border-t border-slate-200 p-3">
+          <button onClick={() => onNavigate('profile')} className="mb-1 flex w-full items-center gap-3 px-2 py-2 text-xs text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+            <Settings size={15} className="text-slate-400" /> Account settings
+          </button>
           <button
             onClick={() => {
               localStorage.removeItem('token');
               localStorage.removeItem('user');
               onNavigate('login');
             }}
-            className="w-full flex items-center gap-2 px-3 py-2 mt-2 rounded-lg text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all"
+            className="flex w-full items-center gap-3 px-2 py-2 text-xs text-slate-600 hover:bg-red-50 hover:text-red-700"
           >
-            <LogOut size={15} />
-            Sign Out
+            <LogOut size={15} className="text-slate-400" /> Sign out
           </button>
         </div>
       </aside>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Topbar */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center px-4 lg:px-6 gap-4 flex-shrink-0">
-          <button className="lg:hidden text-slate-500 hover:text-slate-900" onClick={() => setSidebarOpen(true)}>
-            <Menu size={20} />
-          </button>
-
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-1.5 text-sm text-slate-500 min-w-0">
-            <span className="text-slate-400">HydrogenTrack</span>
-            <ChevronRight size={14} />
-            <span className="font-medium text-slate-700 truncate">
-              {navItems.find(n => n.page === currentPage)?.label ?? 'Overview'}
-            </span>
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <header className="flex min-h-16 shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-white px-5 lg:px-8">
+          <div className="flex min-w-0 items-center gap-2 text-xs text-slate-500">
+            <span className="hidden sm:inline">Operations</span>
+            <ChevronRight size={13} className="hidden sm:inline text-slate-300" />
+            <span className="truncate font-semibold text-slate-800">{navItems.find(n => n.page === currentPage)?.label ?? 'Overview'}</span>
           </div>
-
-          <div className="ml-auto flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <span className="hidden text-[11px] text-slate-400 md:inline">Environment: Production</span>
             <ThemeToggle isDark={isDark} onToggle={onToggleTheme} />
-            <button
-              onClick={() => onNavigate('notifications')}
-              className="relative w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 transition-colors"
-            >
-              <Bell size={18} />
-              {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-              )}
-            </button>
-            <button
-              onClick={() => onNavigate('profile')}
-              className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-semibold"
-            >
-              {ROLE_NAMES[userRole].split(' ').map(n => n[0]).join('')}
+            <button onClick={() => onNavigate('notifications')} className="relative flex h-8 w-8 items-center justify-center text-slate-500 hover:bg-slate-50" aria-label="Open notifications">
+              <Bell size={17} />
+              {unreadCount > 0 && <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-red-600" />}
             </button>
           </div>
         </header>
-
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
-          {children}
-        </main>
+        <main className="w-full min-w-0 flex-1 overflow-x-hidden overflow-y-auto">{children}</main>
       </div>
     </div>
   );

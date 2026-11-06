@@ -69,7 +69,7 @@ export function ErrorState({ message, onRetry }: { message?: string; onRetry?: (
 
 export default function StatesDemo() {
   return (
-    <div className="p-6 space-y-6 max-w-screen-xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
       <div className="mb-4">
         <h1 className="text-xl font-bold text-slate-900">UI State Components</h1>
         <p className="text-sm text-slate-500 mt-0.5">Loading, empty, and error state patterns</p>

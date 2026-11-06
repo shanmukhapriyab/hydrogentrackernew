@@ -30,7 +30,7 @@ export default function ShipmentDetails() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
       <PageHeader
         title="Shipment Tracking"
         subtitle="Real-time shipment status and route information"

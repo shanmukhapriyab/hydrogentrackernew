@@ -94,7 +94,7 @@ export default function DeliveryManagement() {
   ];
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
       <PageHeader
         title="Delivery Management"
         subtitle="Schedule and track all deliveries and drivers"

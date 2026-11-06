@@ -54,7 +54,7 @@ export default function Notifications() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-3xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
       <PageHeader
         title="Notifications"
         subtitle={`${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}`}

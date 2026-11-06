@@ -14,7 +14,7 @@ export default function ProfileSettings() {
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-3xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
       <PageHeader
         title="Profile & Settings"
         subtitle="Manage your account information and preferences"

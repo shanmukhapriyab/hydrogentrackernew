@@ -150,7 +150,7 @@ export default function StorageManagement() {
 
   if (loading) {
     return (
-      <div className="p-6 max-w-screen-xl fade-in">
+      <div className="page-content p-6 fade-in">
         <PageHeader
           title="Storage Management"
           subtitle="Monitor and manage hydrogen storage facilities"
@@ -165,7 +165,7 @@ export default function StorageManagement() {
 
   if (storages.length === 0) {
     return (
-      <div className="p-6 max-w-screen-xl fade-in">
+      <div className="page-content p-6 fade-in">
         <PageHeader
           title="Storage Management"
           subtitle="Monitor and manage hydrogen storage facilities"
@@ -184,7 +184,7 @@ export default function StorageManagement() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
 
       <PageHeader
         title="Storage Management"

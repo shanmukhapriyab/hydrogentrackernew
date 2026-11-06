@@ -104,7 +104,7 @@ export default function ProducerDashboard({
       : 0;
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
       <PageHeader
         title="Producer Dashboard"
         subtitle="September 23, 2026 — Real-time production overview"

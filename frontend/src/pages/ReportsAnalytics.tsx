@@ -56,7 +56,7 @@ export default function ReportsAnalytics() {
   const tabs = ['overview', 'production', 'logistics', 'financial', 'reports'];
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
       <PageHeader
         title="Reports & Analytics"
         subtitle="Platform performance metrics and downloadable reports"

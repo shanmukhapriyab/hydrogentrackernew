@@ -85,27 +85,11 @@ export default function Login({ onLogin, isDark, onToggleTheme }: LoginProps) {
   };
 
   return (
-    <div className="login-page relative min-h-screen bg-gradient-to-br from-slate-100 via-cyan-50/40 to-slate-100 flex">
+    <div className="login-page relative flex min-h-screen">
       <div className="absolute right-5 top-5 z-10">
         <ThemeToggle isDark={isDark} onToggle={onToggleTheme} />
       </div>
-      <div className="login-brand-panel hidden lg:flex flex-col w-[480px] bg-gradient-to-br from-blue-700 via-cyan-700 to-cyan-900 text-white p-12 relative overflow-hidden flex-shrink-0">
-        <div className="absolute inset-0 opacity-10">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full border border-white/40"
-              style={{
-                width: `${200 + i * 120}px`,
-                height: `${200 + i * 120}px`,
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)'
-              }}
-            />
-          ))}
-        </div>
-
+      <div className="login-brand-panel hidden w-[440px] flex-shrink-0 flex-col overflow-hidden bg-[#0b3157] p-12 text-white lg:flex">
         <div className="relative z-10 flex-1 flex flex-col">
           <div className="flex items-center gap-3 mb-16">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">

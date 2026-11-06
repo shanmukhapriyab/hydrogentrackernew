@@ -21,19 +21,46 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
+const configuredOrigins = (process.env.FRONTEND_ORIGINS || 'http://localhost:8443,http://localhost:5173')
+  .split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+  if (configuredOrigins.includes(origin)) return true;
+
+  try {
+    const url = new URL(origin);
+    return (
+      (url.hostname === 'localhost' || url.hostname === '127.0.0.1') &&
+      !url.username &&
+      !url.password &&
+      (url.protocol === 'http:' || url.protocol === 'https:')
+    );
+  } catch {
+    return false;
+  }
+}
+
+const corsOptions = {
+  origin(origin, callback) {
+    callback(null, isAllowedOrigin(origin) ? origin || true : false);
+  },
+  credentials: true
+};
+
 const io = new Server(server, {
   cors: {
-    origin: ['http://localhost:8443', 'http://localhost:5173'],
-    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE']
+    ...corsOptions,
+    methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS']
   }
 });
 
-app.use(
-  cors({
-    origin: ['http://localhost:8443', 'http://localhost:5173'],
-    credentials: true
-  })
-);
+app.use(cors({
+  ...corsOptions,
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS']
+}));
 
 app.use(express.json());
 

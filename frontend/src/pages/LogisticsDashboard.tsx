@@ -260,7 +260,7 @@ export default function LogisticsDashboard({ onNavigate }: { onNavigate: (p: any
   const totalKg = shipments.reduce((sum, shipment) => sum + shipment.quantity, 0);
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
       <PageHeader
         title="Logistics Dashboard"
         subtitle="Real-time shipment tracking and fleet management"

@@ -42,7 +42,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (p: any) =>
   const criticalAlerts = alerts.filter(alert => alert.type === 'critical' && !alert.read).length;
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
       <PageHeader
         title="Admin Dashboard"
         subtitle="Platform-wide operations and system health overview"

@@ -10,14 +10,14 @@ export function ThemeToggle({ isDark, onToggle }: { isDark: boolean; onToggle: (
       aria-checked={isDark}
       aria-label={`${isDark ? 'Dark' : 'Light'} mode enabled. Switch to ${isDark ? 'light' : 'dark'} mode`}
       title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      className={`theme-toggle relative w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-        isDark ? 'bg-blue-600' : 'bg-slate-200'
+      className={`theme-toggle relative w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 ${
+        isDark ? 'bg-slate-700' : 'bg-slate-200'
       }`}
     >
       <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm flex items-center justify-center transition-transform ${
         isDark ? 'translate-x-5' : 'translate-x-0.5'
       }`}>
-        {isDark ? <Moon size={12} className="text-blue-600" /> : <Sun size={12} className="text-amber-500" />}
+        {isDark ? <Moon size={12} className="text-slate-700" /> : <Sun size={12} className="text-amber-500" />}
       </span>
     </button>
   );
@@ -35,27 +35,19 @@ interface StatCardProps {
   onClick?: () => void;
 }
 
-const COLOR_MAP = {
-  blue: { bg: 'bg-blue-50', text: 'text-blue-600', icon: 'bg-blue-100' },
-  cyan: { bg: 'bg-cyan-50', text: 'text-cyan-600', icon: 'bg-cyan-100' },
-  amber: { bg: 'bg-amber-50', text: 'text-amber-600', icon: 'bg-amber-100' },
-  red: { bg: 'bg-red-50', text: 'text-red-600', icon: 'bg-red-100' },
-  purple: { bg: 'bg-purple-50', text: 'text-purple-600', icon: 'bg-purple-100' },
-};
-
 export function StatCard({ label, value, unit, change, changeLabel, icon, color = 'blue', onClick }: StatCardProps) {
-  const c = COLOR_MAP[color];
+  const accent = color === 'red' ? 'border-l-red-500' : color === 'amber' ? 'border-l-amber-500' : color === 'cyan' ? 'border-l-teal-600' : 'border-l-[#0b3157]';
   return (
     <div
-      className={`bg-white rounded-xl border border-slate-200 p-5 ${onClick ? 'cursor-pointer hover:shadow-sm transition-shadow' : ''}`}
+      className={`border border-slate-200 border-l-2 bg-white px-4 py-3 ${accent} ${onClick ? 'cursor-pointer hover:border-slate-300' : ''}`}
       onClick={onClick}
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-center justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">{label}</p>
-          <p className="text-2xl font-bold text-slate-900 leading-none">
+          <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500">{label}</p>
+          <p className="text-xl font-semibold leading-none text-slate-900">
             {typeof value === 'number' ? value.toLocaleString() : value}
-            {unit && <span className="text-base font-medium text-slate-400 ml-1">{unit}</span>}
+            {unit && <span className="ml-1 text-xs font-medium text-slate-400">{unit}</span>}
           </p>
           {(change !== undefined || changeLabel) && (
             <div className="flex items-center gap-1 mt-2">
@@ -73,11 +65,7 @@ export function StatCard({ label, value, unit, change, changeLabel, icon, color 
             </div>
           )}
         </div>
-        {icon && (
-          <div className={`w-10 h-10 rounded-lg ${c.icon} ${c.text} flex items-center justify-center flex-shrink-0`}>
-            {icon}
-          </div>
-        )}
+        {icon && <div className="hidden text-slate-400 sm:block">{icon}</div>}
       </div>
     </div>
   );
@@ -108,7 +96,7 @@ export function Badge({ status, label }: BadgeProps) {
   const s = STATUS_MAP[status] ?? STATUS_MAP['pending'];
   const display = label ?? status.charAt(0).toUpperCase() + status.slice(1);
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${s.bg} ${s.text}`}>
+    <span className={`inline-flex items-center gap-1.5 border px-2 py-0.5 text-[11px] font-medium ${s.bg} ${s.text}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${s.dot} flex-shrink-0`} />
       {display}
     </span>
@@ -124,10 +112,10 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, actions }: PageHeaderProps) {
   return (
-    <div className="flex items-start justify-between gap-4 mb-6">
+    <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 pb-4">
       <div>
-        <h1 className="text-xl font-bold text-slate-900">{title}</h1>
-        {subtitle && <p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>}
+        <h1 className="text-lg font-semibold tracking-tight text-slate-900">{title}</h1>
+        {subtitle && <p className="mt-1 text-xs text-slate-500">{subtitle}</p>}
       </div>
       {actions && <div className="flex items-center gap-2 flex-shrink-0">{actions}</div>}
     </div>
@@ -142,12 +130,12 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export function Button({ variant = 'primary', size = 'md', children, className = '', ...props }: ButtonProps) {
-  const base = 'inline-flex items-center gap-1.5 font-medium rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 disabled:opacity-50 cursor-pointer';
+  const base = 'inline-flex items-center gap-1.5 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#0b625e] focus:ring-offset-1 disabled:opacity-50 cursor-pointer';
   const variants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm',
-    secondary: 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 shadow-sm',
+    primary: 'bg-[#0b3157] text-white hover:bg-[#082642]',
+    secondary: 'border border-slate-300 bg-white text-slate-700 hover:bg-slate-50',
     ghost: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-    danger: 'bg-red-600 text-white hover:bg-red-700 shadow-sm',
+    danger: 'bg-red-700 text-white hover:bg-red-800',
   };
   const sizes = {
     sm: 'text-xs px-3 py-1.5',
@@ -172,17 +160,17 @@ interface CardProps {
 
 export function Card({ children, className = '', title, subtitle, actions, noPadding }: CardProps) {
   return (
-    <div className={`bg-white rounded-xl border border-slate-200 ${noPadding ? '' : ''} ${className}`}>
+    <div className={`bg-white border border-slate-200 ${noPadding ? '' : ''} ${className}`}>
       {(title || actions) && (
-        <div className="flex items-center justify-between gap-3 px-5 py-4 border-b border-slate-100">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-3">
           <div>
-            {title && <h3 className="font-semibold text-slate-800 text-sm">{title}</h3>}
-            {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+            {title && <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-800">{title}</h3>}
+            {subtitle && <p className="mt-1 text-[11px] text-slate-500">{subtitle}</p>}
           </div>
           {actions && <div className="flex items-center gap-2">{actions}</div>}
         </div>
       )}
-      <div className={noPadding ? '' : 'p-5'}>{children}</div>
+      <div className={noPadding ? '' : 'p-4'}>{children}</div>
     </div>
   );
 }
@@ -195,7 +183,7 @@ export function ProgressBar({ value, max = 100, color = 'blue', showLabel = fals
   const colorClass = pct > 85 ? 'bg-cyan-500' : pct > 60 ? 'bg-blue-500' : pct > 30 ? 'bg-amber-500' : 'bg-red-500';
   return (
     <div className="flex items-center gap-2">
-      <div className={`flex-1 bg-slate-100 rounded-full overflow-hidden ${size === 'sm' ? 'h-1.5' : 'h-2'}`}>
+      <div className={`flex-1 overflow-hidden bg-slate-100 ${size === 'sm' ? 'h-1.5' : 'h-2'}`}>
         <div className={`h-full ${colorClass} rounded-full transition-all`} style={{ width: `${pct}%` }} />
       </div>
       {showLabel && <span className="text-xs text-slate-500 w-8 text-right">{pct}%</span>}
@@ -232,7 +220,7 @@ export function Input({ label, error, helpText, className = '', ...props }: Inpu
     <div className="space-y-1">
       {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
       <input
-        className={`w-full px-3 py-2 text-sm border rounded-lg outline-none transition-all
+        className={`w-full px-3 py-2 text-sm border outline-none transition-all
           ${error ? 'border-red-400 focus:ring-2 focus:ring-red-200' : 'border-slate-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100'}
           placeholder:text-slate-400 text-slate-900 bg-white ${className}`}
         {...props}
@@ -254,7 +242,7 @@ export function Select({ label, options, className = '', ...props }: SelectProps
     <div className="space-y-1">
       {label && <label className="text-sm font-medium text-slate-700">{label}</label>}
       <select
-        className={`w-full px-3 py-2 text-sm border border-slate-200 rounded-lg outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 text-slate-900 bg-white ${className}`}
+        className={`w-full px-3 py-2 text-sm border border-slate-200 outline-none focus:border-[#0b625e] focus:ring-2 focus:ring-[#dcefee] text-slate-900 bg-white ${className}`}
         {...props}
       >
         {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
@@ -269,9 +257,9 @@ export function Table({ headers, children }: { headers: string[]; children: Reac
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-slate-100">
+          <tr className="border-b border-slate-200 bg-slate-50/70">
             {headers.map(h => (
-              <th key={h} className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wide px-4 py-3 first:pl-5 last:pr-5 whitespace-nowrap">
+              <th key={h} className="text-left text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-4 py-2.5 first:pl-5 last:pr-5 whitespace-nowrap">
                 {h}
               </th>
             ))}
@@ -286,7 +274,7 @@ export function Table({ headers, children }: { headers: string[]; children: Reac
 export function Tr({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) {
   return (
     <tr
-      className={`border-b border-slate-50 ${onClick ? 'cursor-pointer hover:bg-slate-50' : ''} transition-colors`}
+      className={`border-b border-slate-100 ${onClick ? 'cursor-pointer hover:bg-slate-50' : ''} transition-colors`}
       onClick={onClick}
     >
       {children}
@@ -296,6 +284,6 @@ export function Tr({ children, onClick }: { children: React.ReactNode; onClick?:
 
 export function Td({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <td className={`px-4 py-3 text-slate-700 first:pl-5 last:pr-5 ${className}`}>{children}</td>
+    <td className={`px-4 py-2.5 text-slate-700 first:pl-5 last:pr-5 ${className}`}>{children}</td>
   );
 }

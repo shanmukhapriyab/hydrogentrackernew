@@ -50,7 +50,7 @@ export default function ProductionManagement() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-screen-xl fade-in">
+    <div className="page-content p-6 space-y-6 fade-in">
       <PageHeader
         title="Production Management"
         subtitle="Monitor and control hydrogen production facilities"
